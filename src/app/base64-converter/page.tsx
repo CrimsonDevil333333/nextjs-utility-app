@@ -11,7 +11,7 @@ export default function Base64ConverterPage() {
 
   const output = useMemo(() => {
     // Reset copy success message when input or mode changes
-    if (copySuccess) setCopySuccess(false);
+    setCopySuccess(false);
 
     if (!input) return '';
     try {
