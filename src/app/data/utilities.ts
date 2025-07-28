@@ -9,6 +9,7 @@ export type Utility = {
 };
 
 export const utilities: Utility[] = [
+  // Existing Utilities...
   { name: 'Metric Converter', href: '/metric-converter', description: 'Convert length, weight, and volume.', emoji: '📏', category: 'Converters' },
   { name: 'JWT Decoder', href: '/jwt-decoder', description: 'Decode and inspect JWT tokens.', emoji: '🔐', category: 'Developers' },
   { name: 'Currency Converter', href: '/currency-converter', description: 'Real-time exchange rates.', emoji: '💸', category: 'Finance' },
@@ -39,4 +40,20 @@ export const utilities: Utility[] = [
   { name: 'Image Compressor', href: '/image-compressor', description: 'Compress and resize images in your browser.', emoji: '🖼️', category: 'Tools' },
   { name: 'Minesweeper', href: '/minesweeper', description: 'Play the classic game of Minesweeper.', emoji: '💣', category: 'Games' },
   { name: 'QR Code Generator', href: '/qr-code-generator', description: 'Create and customize QR codes for any text or URL.', emoji: '📲', category: 'Tools' },
+  { name: '2048', href: '/2048', description: 'A classic sliding puzzle game to reach the 2048 tile.', emoji: '🔢', category: 'Games' },
+  { name: 'Hangman', href: '/hangman', description: 'The popular word-guessing game.', emoji: '🚹', category: 'Games' },
+  { name: 'Memory Game', href: '/memory-game', description: 'A card-flipping game to test your memory.', emoji: '🧠', category: 'Games' },
+  { name: 'Connect Four', href: '/connect-four', description: 'The classic game of getting four checkers in a row.', emoji: '🔵', category: 'Games' },
+  { name: 'Wordle Clone', href: '/wordle-clone', description: 'A simple version of the popular daily word game.', emoji: '🟩', category: 'Games' },
+  { name: 'Regex Tester', href: '/regex-tester', description: 'An interactive tool to write and test regular expressions.', emoji: '🧪', category: 'Developers' },
+  { name: 'Markdown Previewer', href: '/markdown-previewer', description: 'A real-time editor and previewer for Markdown.', emoji: '📝', category: 'Developers' },
+  { name: 'SQL Formatter', href: '/sql-formatter', description: 'Beautify and format messy SQL queries.', emoji: '🐬', category: 'Developers' },
+  { name: 'Timezone Converter', href: '/timezone-converter', description: 'Quickly compare the time across different timezones.', emoji: '🌍', category: 'Time & Date' },
+  { name: 'Number Base Converter', href: '/number-base-converter', description: 'Convert numbers between binary, octal, decimal, and hex.', emoji: '🔟', category: 'Converters' },
+  { name: 'Slug Generator', href: '/slug-generator', description: 'Convert any string into a URL-friendly slug.', emoji: '🔗', category: 'Text' },
+  { name: 'Morse Code Translator', href: '/morse-code-translator', description: 'Translate text to and from Morse code.', emoji: '📻', category: 'Text' },
+  { name: 'Text Sorter', href: '/text-sorter', description: 'Sort lines of text alphabetically or by length.', emoji: '⇅', category: 'Text' },
+  { name: 'CSS Gradient Generator', href: '/css-gradient-generator', description: 'A visual tool to create and copy CSS gradients.', emoji: '🎨', category: 'Design' },
+  { name: 'Image Color Picker', href: '/image-color-picker', description: 'Upload an image to get the color code of any pixel.', emoji: '📍', category: 'Design' },
+  { name: 'Favicon Generator', href: '/favicon-generator', description: 'Generate different favicon sizes from a single image.', emoji: '✨', category: 'Design' },
 ];
