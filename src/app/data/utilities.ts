@@ -1,5 +1,3 @@
-// app/data/utilities.ts
-
 export type Utility = {
   name: string;
   href: string;
@@ -13,7 +11,9 @@ export const utilities: Utility[] = [
   { name: 'Base64 Converter', href: '/base64-converter', description: 'Encode and decode Base64 text.', emoji: '📰', category: 'Converters' },
   { name: 'BMI Calculator', href: '/bmi-calculator', description: 'Calculate your Body Mass Index.', emoji: '💪', category: 'Health' },
   { name: 'Box Shadow Generator', href: '/box-shadow-generator', description: 'Visually create and customize CSS box shadows.', emoji: '🔳', category: 'Design' },
+  { name: 'Breakout', href: '/breakout', description: 'A retro arcade game where you break bricks with a paddle.', emoji: '�', category: 'Games' },
   { name: 'Coin Toss', href: '/coin-toss', description: 'Flip a coin to make a decision.', emoji: '🪙', category: 'Games' },
+  { name: 'Color Contrast Checker', href: '/color-contrast-checker', description: 'Check color contrast against WCAG accessibility standards.', emoji: '👁️‍🗨️', category: 'Design' },
   { name: 'Color Converter', href: '/color-converter', description: 'Convert HEX, RGB, and HSL colors.', emoji: '🎨', category: 'Design' },
   { name: 'Compound Interest Calculator', href: '/compound-interest-calculator', description: 'Calculate the future value of an investment.', emoji: '📈', category: 'Finance' },
   { name: 'Connect Four', href: '/connect-four', description: 'The classic game of getting four checkers in a row.', emoji: '🔵', category: 'Games' },
@@ -29,6 +29,7 @@ export const utilities: Utility[] = [
   { name: 'Hangman', href: '/hangman', description: 'The popular word-guessing game.', emoji: '🤔', category: 'Games' },
   { name: 'Hash Generator', href: '/hash-generator', description: 'Generate SHA-256/512 hashes.', emoji: '🛡️', category: 'Security' },
   { name: 'HTML Entities', href: '/html-entities', description: 'Encode/decode HTML special characters.', emoji: '↔️', category: 'Text' },
+  { name: 'HTTP Status Codes', href: '/http-status-codes', description: 'Quickly look up the meaning of any HTTP status code.', emoji: '📜', category: 'Developers' },
   { name: 'Image Color Picker', href: '/image-color-picker', description: 'Upload an image to get the color code of any pixel.', emoji: '📍', category: 'Design' },
   { name: 'Image Compressor', href: '/image-compressor', description: 'Compress and resize images in your browser.', emoji: '🖼️', category: 'Tools' },
   { name: 'JSON Formatter', href: '/json-formatter', description: 'Beautify and validate JSON data.', emoji: '📑', category: 'Developers' },
@@ -51,7 +52,9 @@ export const utilities: Utility[] = [
   { name: 'Scientific Calculator', href: '/scientific-calculator', description: 'An advanced calculator with scientific functions.', emoji: '🔬', category: 'Math' },
   { name: 'Slug Generator', href: '/slug-generator', description: 'Convert any string into a URL-friendly slug.', emoji: '🏷️', category: 'Text' },
   { name: 'Snake Game', href: '/snake-game', description: 'Play the classic, retro Snake game.', emoji: '🐍', category: 'Games' },
+  { name: 'Solitaire', href: '/solitaire', description: 'The classic Klondike Solitaire card game.', emoji: '🃏', category: 'Games' },
   { name: 'SQL Formatter', href: '/sql-formatter', description: 'Beautify and format messy SQL queries.', emoji: '🗃️', category: 'Developers' },
+  { name: 'Stopwatch', href: '/stopwatch', description: 'A precise stopwatch with lap functionality.', emoji: '⏱️', category: 'Tools' },
   { name: 'Sudoku', href: '/sudoku', description: 'A classic number puzzle game.', emoji: '🧩', category: 'Games' },
   { name: 'Tetris', href: '/tetris', description: 'The classic block-stacking puzzle game.', emoji: '🧱', category: 'Games' },
   { name: 'Text Case Converter', href: '/text-case-converter', description: 'Convert text between various casing conventions.', emoji: '🔡', category: 'Text' },
@@ -60,6 +63,7 @@ export const utilities: Utility[] = [
   { name: 'Tic Tac Toe', href: '/tic-tac-toe', description: 'Play a classic game of Tic Tac Toe.', emoji: '⭕', category: 'Games' },
   { name: 'Timezone Converter', href: '/timezone-converter', description: 'Quickly compare the time across different timezones.', emoji: '🌍', category: 'Time & Date' },
   { name: 'Tip Calculator', href: '/tip-calculator', description: 'Quickly calculate tips and split the bill.', emoji: '🧾', category: 'Math' },
+  { name: 'Unit Price Calculator', href: '/unit-price-calculator', description: 'Compare items to find the best value by unit price.', emoji: '🛒', category: 'Math' },
   { name: 'URL Encoder', href: '/url-encoder', description: 'Encode & decode URL components.', emoji: '🔗', category: 'Developers' },
   { name: 'URL Parser/Builder', href: '/url-parser', description: 'Deconstruct or construct URLs.', emoji: '🌐', category: 'Developers' },
   { name: 'UUID Generator', href: '/uuid-generator', description: 'Generate universally unique IDs.', emoji: '🆔', category: 'Developers' },
