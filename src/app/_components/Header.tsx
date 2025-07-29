@@ -1,22 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const showHeader = pathname !== '/';
 
   if (!showHeader) return null;
 
   return (
     <header className="py-4 px-8 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm flex justify-between items-center">
-      <Link
-        href="/"
+      <button
+        onClick={() => router.back()}
         className="font-bold text-xl text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
       >
         Dev Toolkit
-      </Link>
+      </button>
 
       <nav>
         <Link
