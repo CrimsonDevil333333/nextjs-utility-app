@@ -160,8 +160,8 @@ const Game2048Page = () => {
     switch (e.key) {
       case 'ArrowLeft': performMove('left'); break;
       case 'ArrowRight': performMove('right'); break;
-      case 'ArrowUp': performMove('up'); break;
-      case 'ArrowDown': performMove('down'); break;
+      case 'ArrowUp': performMove('down'); break;
+      case 'ArrowDown': performMove('up'); break;
     }
   }, [performMove]);
 
@@ -187,7 +187,7 @@ const Game2048Page = () => {
       if (absDx > absDy) {
         performMove(dx > 0 ? 'right' : 'left');
       } else {
-        performMove(dy > 0 ? 'down' : 'up');
+        performMove(dy > 0 ? 'up' : 'down');
       }
     }
     setTouchStart(null);
