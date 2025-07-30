@@ -104,26 +104,66 @@ const RegexGeneratorPage = () => {
         <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Describe a text pattern in plain English to generate a regular expression.</p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Configuration</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="agent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">AI Agent</label>
-            <select id="agent" value={selectedAgent} onChange={(e) => setSelectedAgent(e.target.value as Agent)} className="mt-1 block w-full p-3 border rounded-md dark:bg-gray-700 dark:border-gray-600">
-              <option value="gemini">Gemini</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{selectedAgent === 'gemini' ? 'Gemini' : 'OpenAI'} API Key</label>
-            <div className="flex gap-2 mt-1">
-              <input id="apiKey" type="password" value={apiKeys[selectedAgent]} onChange={(e) => handleApiKeyChange(selectedAgent, e.target.value)} placeholder={`Enter your ${selectedAgent} key`} className="flex-grow p-3 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
-              <button onClick={handleSaveApiKeys} className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${isKeySaved ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-600 hover:bg-gray-300'}`}>
-                {isKeySaved ? <Check size={18} /> : <Save size={18} />} {isKeySaved ? 'Saved' : 'Save'}
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 mb-8">
+  <h2 className="text-2xl font-bold mb-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+    Configuration
+  </h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        AI Agent
+      </label>
+      <div className="flex gap-2 bg-slate-200 dark:bg-slate-700/50 p-1 rounded-full">
+        <button
+          onClick={() => setSelectedAgent('gemini')}
+          className={`w-full py-2 rounded-full font-semibold transition-all duration-200 ${
+            selectedAgent === 'gemini'
+              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-slate-800/50'
+          }`}
+        >
+          Gemini
+        </button>
+        {/* Add other agents here using the same pattern */}
       </div>
+    </div>
+    <div>
+      <label
+        htmlFor="apiKey"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
+        {selectedAgent === 'gemini' ? 'Gemini' : 'OpenAI'} API Key
+      </label>
+      <div className="flex gap-2 mt-2">
+        <div className="relative flex-grow">
+          <KeyRound
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+            aria-hidden="true"
+          />
+          <input
+            id="apiKey"
+            type="password"
+            value={apiKeys[selectedAgent]}
+            onChange={(e) => handleApiKeyChange(selectedAgent, e.target.value)}
+            placeholder={`Enter your ${selectedAgent} key`}
+            className="w-full p-3 pl-10 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+        </div>
+        <button
+          onClick={handleSaveApiKeys}
+          className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm ${
+            isKeySaved
+              ? 'bg-green-500 text-white'
+              : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+          }`}
+          aria-label="Save API Key"
+        >
+          {isKeySaved ? <Check size={18} /> : <Save size={18} />}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       <div className="space-y-4">
         <div>
