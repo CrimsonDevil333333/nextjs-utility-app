@@ -1,262 +1,97 @@
-'use client';
-
+// app/about/page.tsx
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Info, ChevronDown, ChevronUp, ArrowUp } from 'lucide-react';
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { utilities, Utility } from '@/app/data/utilities';
 
-// --- Debounce Hook ---
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
-}
-
-// Sub-component for individual utility cards
-function UtilityCard({ util }: { util: Utility }) {
-  return (
-    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in">
-      <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200 dark:border-gray-700 h-full flex flex-col justify-between">
-        <div>
-          <span className="text-4xl mb-4 block transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{util.name}</h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">{util.description}</p>
-        </div>
-        <div className="mt-4 text-blue-600 dark:text-blue-400 flex items-center group-hover:translate-x-1 transition-transform duration-200 text-sm">
-          Go to tool
-          <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-// --- Style mapping for category pills ---
-const CATEGORY_COLORS: Record<string, string> = {
-  'Converters': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200',
-  'Developers': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200',
-  'Finance': 'bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-200',
-  'Security': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200',
-  'Design': 'bg-pink-100 text-pink-800 dark:bg-pink-900/50 dark:text-pink-200',
-  'Text': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200',
-  'Time & Date': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200',
-  'Math': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200',
-  'Tools': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200',
-  'Games': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-200',
-  'Health': 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200',
-  'Network': 'bg-lime-100 text-lime-800 dark:bg-lime-900/50 dark:text-lime-200',
-  'AI Tools': 'bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200',
-  'All': 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+export const metadata: Metadata = {
+  title: 'About - Dev Toolkit',
+  description: 'Learn more about the Dev Toolkit project, its mission, and its creator, Satyaa G.',
 };
 
-export default function HomePageContent() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
-  
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
-
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
-  const [showScrollToTop, setShowScrollToTop] = useState(false);
-  
-  const [dynamicFilterCategories, setDynamicFilterCategories] = useState<{name: string, emoji: string}[]>([]);
-
-  const groupedUtilities = useMemo(() => {
-    return utilities.reduce((acc, util) => {
-      (acc[util.category] = acc[util.category] || []).push(util);
-      return acc;
-    }, {} as Record<string, Utility[]>);
-  }, []);
-
-  useEffect(() => {
-    const categories = Object.keys(groupedUtilities).sort();
-    const filters = categories.map(category => {
-      const utilsInCategory = groupedUtilities[category];
-      const randomUtil = utilsInCategory[Math.floor(Math.random() * utilsInCategory.length)];
-      return {
-        name: category,
-        emoji: randomUtil.emoji,
-      };
-    });
-    setDynamicFilterCategories([{ name: 'All', emoji: '🌟' }, ...filters]);
-  }, [groupedUtilities]);
-
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (debouncedSearchTerm) {
-      params.set('search', debouncedSearchTerm);
-    } else {
-      params.delete('search');
-    }
-    if (selectedCategory && selectedCategory !== 'All') {
-      params.set('category', selectedCategory);
-    } else {
-      params.delete('category');
-    }
-    router.replace(`${pathname}?${params.toString()}`);
-  }, [debouncedSearchTerm, selectedCategory, pathname, router]);
-
-  useEffect(() => {
-    const savedState = localStorage.getItem('expandedCategories');
-    if (savedState) {
-      setExpandedCategories(JSON.parse(savedState));
-    } else {
-      const initialState = Object.keys(groupedUtilities).reduce((acc, category) => {
-        acc[category] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
-      setExpandedCategories(initialState);
-    }
-  }, [groupedUtilities]);
-
-  useEffect(() => {
-    if (Object.keys(expandedCategories).length > 0) {
-      localStorage.setItem('expandedCategories', JSON.stringify(expandedCategories));
-    }
-  }, [expandedCategories]);
-
-  const filteredUtilities = useMemo(() => {
-    const term = debouncedSearchTerm.toLowerCase();
-    const category = selectedCategory;
-
-    if (!term && category === 'All') return [];
-
-    return utilities.filter(util => {
-      const categoryMatch = category === 'All' || util.category === category;
-      const searchMatch = !term ||
-        util.name.toLowerCase().includes(term) ||
-        util.description.toLowerCase().includes(term) ||
-        util.category.toLowerCase().includes(term);
-      return categoryMatch && searchMatch;
-    });
-  }, [debouncedSearchTerm, selectedCategory]);
-  
-  const handleScroll = useCallback(() => setShowScrollToTop(window.scrollY > 300), []);
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-  
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-  const toggleCategory = (category: string) => setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }));
-  const setAllCategoriesExpanded = (isExpanded: boolean) => {
-    const newState = Object.keys(groupedUtilities).reduce((acc, key) => {
-      acc[key] = isExpanded;
-      return acc;
-    }, {} as Record<string, boolean>);
-    setExpandedCategories(newState);
-  };
-  
-  const isFiltered = debouncedSearchTerm !== '' || selectedCategory !== 'All';
-
+export default function AboutPage() {
   return (
     <main className="min-h-screen p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-      <div className="max-w-6xl mx-auto py-8">
-        <header className="relative text-center mb-12 animate-fade-in">
-           <Link href="/about" className="absolute top-0 right-0 mt-2 mr-2 sm:mt-4 sm:mr-4 transition-colors duration-200 z-10" title="About Us">
-             <div className="sm:hidden w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-600">
-               <Info className="w-5 h-5" />
-             </div>
-             <div className="hidden sm:inline-block px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 font-medium text-sm">
-               Learn About Us
-             </div>
-           </Link>
-          <h1 className="text-4xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-4 tracking-tight">
-            Dev Toolkit
-          </h1>
-          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Your one-stop collection of essential online utilities for developers, designers, and anyone needing a quick tool.
-          </p>
-        </header>
+      <div className="max-w-4xl mx-auto py-8">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-10 text-gray-900 dark:text-gray-100">
+          About The Dev Toolkit
+        </h1>
 
-        <section className="mb-12">
-           <div className="relative mb-6">
-             <input 
-               type="text" 
-               placeholder="Search for any tool..." 
-               className="w-full p-4 pl-12 text-lg border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-               value={searchTerm} 
-               onChange={(e) => setSearchTerm(e.target.value)} 
-             />
-             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-           </div>
-           
-           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 min-h-[44px]">
-             {dynamicFilterCategories.length > 1 && dynamicFilterCategories.map(cat => {
-                const isSelected = selectedCategory === cat.name;
-                const colorClasses = CATEGORY_COLORS[cat.name] || CATEGORY_COLORS['All'];
-                
-                return (
-                   <button 
-                     key={cat.name}
-                     onClick={() => setSelectedCategory(cat.name)}
-                     className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105
-                       ${isSelected 
-                         ? `${colorClasses} shadow-md` 
-                         : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                       }`}
-                   >
-                     <span>{cat.emoji}</span>
-                     <span>{cat.name}</span>
-                   </button>
-                )
-             })}
-           </div>
+        {/* Section: What is this project? */}
+        <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Our Mission
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            The Dev Toolkit is a passion project aimed at providing a comprehensive, easy-to-use, and highly accessible collection of over <strong>45+ online utilities</strong>. Our goal is to streamline workflows and make complex operations simple for everyone.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            Whether you're a developer needing to format JSON, a designer creating a favicon, or just looking to play a quick game of Minesweeper, this toolkit is built for you. We are constantly working to expand our offerings and ensure a smooth, intuitive user experience.
+          </p>
         </section>
 
-        {!isFiltered && (
-          <div className="flex justify-end gap-2 mb-6">
-            <button onClick={() => setAllCategoriesExpanded(true)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Expand All</button>
-            <button onClick={() => setAllCategoriesExpanded(false)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Collapse All</button>
+        {/* Section: Technologies Used */}
+        <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Built With
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-200 text-sm font-medium">Next.js</span>
+            <span className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full dark:bg-purple-900 dark:text-purple-200 text-sm font-medium">React</span>
+            <span className="px-4 py-2 bg-teal-100 text-teal-800 rounded-full dark:bg-teal-900 dark:text-teal-200 text-sm font-medium">Tailwind CSS</span>
+            <span className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full dark:bg-yellow-900 dark:text-yellow-200 text-sm font-medium">TypeScript</span>
+            <span className="px-4 py-2 bg-pink-100 text-pink-800 rounded-full dark:bg-pink-900 dark:text-pink-200 text-sm font-medium">Lucide React</span>
+            <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full dark:bg-indigo-900 dark:text-indigo-200 text-sm font-medium">React Markdown</span>
+            <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full dark:bg-green-900 dark:text-green-200 text-sm font-medium">Random Words</span>
+            <span className="px-4 py-2 bg-red-100 text-red-800 rounded-full dark:bg-red-900 dark:text-red-200 text-sm font-medium">SQL Formatter</span>
+            <span className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full dark:bg-orange-900 dark:text-orange-200 text-sm font-medium">Date FNS</span>
+            <span className="px-4 py-2 bg-cyan-100 text-cyan-800 rounded-full dark:bg-cyan-900 dark:text-cyan-200 text-sm font-medium">Image Compression</span>
           </div>
-        )}
-        
-        {isFiltered ? (
-          <>
-            {filteredUtilities.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredUtilities.map(util => (<UtilityCard key={util.name} util={util} />))}
-              </div>
-            ) : (
-              <div className="text-center py-10"><p className="text-gray-600 dark:text-gray-400 text-lg">No utilities found matching your criteria.</p></div>
-            )}
-          </>
-        ) : (
-          <div className="space-y-8">
-            {Object.entries(groupedUtilities).map(([category, utils]) => (
-              <section key={category}>
-                <button onClick={() => toggleCategory(category)} className="w-full flex justify-between items-center text-left text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b-2 border-blue-500 dark:border-blue-400">
-                  <span>{category}</span>
-                  {expandedCategories[category] ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
-                </button>
-                <div className={`grid overflow-hidden transition-all duration-500 ease-in-out ${ expandedCategories[category] ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0' }`}>
-                  <div className="min-h-0 col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                     {utils.map(util => (<UtilityCard key={util.name} util={util} />))}
-                  </div>
-                </div>
-              </section>
-            ))}
+        </section>
+
+        {/* Section: About Me / The Creator */}
+        <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            About the Creator
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            Hello! I'm Satyaa G, the developer behind The Dev Toolkit. This project started as a way for me to hone my skills in modern web development, particularly with Next.js, React, and Tailwind CSS, while also building practical tools that I found myself frequently needing.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            I'm passionate about creating efficient and user-friendly applications. You can connect with me and see more of my work on my professional profiles:
+          </p>
+          <div className="flex gap-4 justify-center sm:justify-start">
+            <Link href="https://github.com/CrimsonDevil333333" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg shadow hover:bg-gray-700 transition-colors dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017 2 16.223 4.673 19.72 8.241 20.94c.408.076.559-.176.559-.387 0-.191-.007-.696-.011-1.365-2.227.485-2.695-.91-2.695-.91-.364-.924-.888-1.171-1.171-1.171-.722-.49-.054-.48.04-.473.67.047 1.022.69 1.022.69.596 1.029 1.562.73 1.942.559.06-.436.234-.73.427-.897-1.48-.168-3.04-.739-3.04-3.27 0-.726.257-1.32.68-1.782-.068-.168-.295-.845.065-1.76 0 0 .554-.179 1.815.688.525-.145 1.085-.218 1.643-.221.558.003 1.118.076 1.643.221 1.26-.867 1.815-.688 1.815-.688.36 1.065.132 1.592.065 1.76.425.462.682 1.056.682 1.782 0 2.537-1.563 3.097-3.048 3.264.238.204.453.606.453 1.222 0 .883-.007 1.597-.011 1.815 0 .213.144.467.564.386C19.327 19.715 22 16.218 22 12.017 22 6.484 17.523 2 12 2Z" clipRule="evenodd" /></svg>
+              GitHub
+            </Link>
+            <Link href="https://www.linkedin.com/in/satyaa-g-b4b399111/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-blue-700 text-white rounded-lg shadow hover:bg-blue-600 transition-colors">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.563c0-1.332-.023-3.054-1.852-3.054-1.853 0-2.136 1.445-2.136 2.964v5.653H9.103V9.216h3.411v1.564h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.287zM5.77 7.929c-1.168 0-2.112-.943-2.112-2.111 0-1.168.944-2.112 2.112-2.112 1.168 0 2.111.944 2.111 2.112 0 1.168-.943 2.111-2.111 2.111zm1.782 12.523H3.988V9.216h3.564v11.236zM22.227 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.456c.979 0 1.772-.773 1.772-1.729V1.729C24 .774 23.207 0 22.227 0z"></path></svg>
+              LinkedIn
+            </Link>
           </div>
-        )}
+        </section>
+
+        {/* Section: Feedback & Contact */}
+        <section className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Feedback & Support
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            Your feedback is invaluable! If you have suggestions for new tools, ideas for improvements, or encounter any issues, please don't hesitate to reach out.
+          </p>
+          <div className="text-center">
+             <Link
+                href="https://github.com/CrimsonDevil333333/nextjs-utility-app/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition-colors"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.105A9.702 9.702 0 0112 4c4.97 0 9 3.582 9 8z"></path></svg>
+                Report an Issue / Suggest Feature
+            </Link>
+          </div>
+        </section>
+
       </div>
-      
-      {showScrollToTop && (
-        <button onClick={scrollToTop} className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg" aria-label="Scroll to top" title="Scroll to top">
-          <ArrowUp className="w-6 h-6" />
-        </button>
-      )}
     </main>
   );
 }
