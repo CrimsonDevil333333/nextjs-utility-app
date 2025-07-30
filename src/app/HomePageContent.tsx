@@ -39,6 +39,24 @@ function UtilityCard({ util }: { util: Utility }) {
   );
 }
 
+// --- Style mapping for category pills ---
+const CATEGORY_COLORS: Record<string, string> = {
+  'Converters': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200',
+  'Developers': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200',
+  'Finance': 'bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-200',
+  'Security': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200',
+  'Design': 'bg-pink-100 text-pink-800 dark:bg-pink-900/50 dark:text-pink-200',
+  'Text': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200',
+  'Time & Date': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200',
+  'Math': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200',
+  'Tools': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200',
+  'Games': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-200',
+  'Health': 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200',
+  'Network': 'bg-lime-100 text-lime-800 dark:bg-lime-900/50 dark:text-lime-200',
+  'AI Tools': 'bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200',
+  'All': 'bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-200'
+};
+
 export default function HomePageContent() {
   const router = useRouter();
   const pathname = usePathname();
@@ -51,29 +69,29 @@ export default function HomePageContent() {
 
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
-
-  const dynamicFilterCategories = useMemo(() => {
-    const categoriesMap = new Map<string, string>();
-    utilities.forEach(util => {
-      if (!categoriesMap.has(util.category)) {
-        categoriesMap.set(util.category, util.emoji);
-      }
-    });
-    const sortedCategories = Array.from(categoriesMap.keys()).sort();
-    const filters = sortedCategories.map(category => ({
-      name: category,
-      emoji: categoriesMap.get(category)!,
-    }));
-    return [{ name: 'All', emoji: '🌟' }, ...filters];
-  }, []);
+  
+  const [dynamicFilterCategories, setDynamicFilterCategories] = useState<{name: string, emoji: string}[]>([]);
 
   const groupedUtilities = useMemo(() => {
-    const categories = dynamicFilterCategories.slice(1).map(c => c.name);
-    return categories.reduce((acc, category) => {
-      acc[category] = utilities.filter(util => util.category === category);
+    return utilities.reduce((acc, util) => {
+      (acc[util.category] = acc[util.category] || []).push(util);
       return acc;
     }, {} as Record<string, Utility[]>);
-  }, [dynamicFilterCategories]);
+  }, []);
+
+  useEffect(() => {
+    const categories = Object.keys(groupedUtilities).sort();
+    const filters = categories.map(category => {
+      const utilsInCategory = groupedUtilities[category];
+      const randomUtil = utilsInCategory[Math.floor(Math.random() * utilsInCategory.length)];
+      return {
+        name: category,
+        emoji: randomUtil.emoji,
+      };
+    });
+    setDynamicFilterCategories([{ name: 'All', emoji: '🌟' }, ...filters]);
+  }, [groupedUtilities]);
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -175,21 +193,26 @@ export default function HomePageContent() {
              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
            </div>
            
-           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-             {dynamicFilterCategories.map(cat => (
-               <button 
-                 key={cat.name}
-                 onClick={() => setSelectedCategory(cat.name)}
-                 className={`flex items-center gap-2 px-3 py-2 sm:px-4 text-sm sm:text-base font-semibold rounded-full transition-all duration-200 ${
-                   selectedCategory === cat.name 
-                   ? 'bg-blue-600 text-white shadow-md' 
-                   : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-                 }`}
-               >
-                 <span>{cat.emoji}</span>
-                 <span>{cat.name}</span>
-               </button>
-             ))}
+           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 min-h-[44px]">
+             {dynamicFilterCategories.length > 1 && dynamicFilterCategories.map(cat => {
+                const isSelected = selectedCategory === cat.name;
+                const colorClasses = CATEGORY_COLORS[cat.name] || CATEGORY_COLORS['All'];
+                
+                return (
+                   <button 
+                     key={cat.name}
+                     onClick={() => setSelectedCategory(cat.name)}
+                     className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105
+                       ${isSelected 
+                         ? `${colorClasses} shadow-md` 
+                         : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                       }`}
+                   >
+                     <span>{cat.emoji}</span>
+                     <span>{cat.name}</span>
+                   </button>
+                )
+             })}
            </div>
         </section>
 
