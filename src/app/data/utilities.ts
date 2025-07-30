@@ -8,6 +8,7 @@ export type Utility = {
 
 export const utilities: Utility[] = [
   { name: '2048', href: '/2048', description: 'A classic sliding puzzle game to reach the 2048 tile.', emoji: '🔢', category: 'Games' },
+  // { name: 'Audio Converter', href: '/audio-converter', description: 'Convert audio files to different formats in your browser.', emoji: '🎵', category: 'Converters' },
   { name: 'Base64 Converter', href: '/base64-converter', description: 'Encode and decode Base64 text.', emoji: '📰', category: 'Converters' },
   { name: 'BMI Calculator', href: '/bmi-calculator', description: 'Calculate your Body Mass Index.', emoji: '💪', category: 'Health' },
   { name: 'Box Shadow Generator', href: '/box-shadow-generator', description: 'Visually create and customize CSS box shadows.', emoji: '🔳', category: 'Design' },
@@ -39,9 +40,11 @@ export const utilities: Utility[] = [
   { name: 'JSON Formatter', href: '/json-formatter', description: 'Beautify and validate JSON data.', emoji: '📑', category: 'Developers' },
   { name: 'JWT Decoder', href: '/jwt-decoder', description: 'Decode and inspect JWT tokens.', emoji: '🔐', category: 'Developers' },
   { name: 'Keyboard Layout Tester', href: '/keyboard-tester', description: 'Visualize and test your physical keyboard keys.', emoji: '⌨️', category: 'Tools' },
+  { name: 'Language Translator', href: '/language-translator', description: 'Translate text between different languages.', emoji: '🌐', category: 'AI Tools' },
   { name: 'Loan Calculator', href: '/loan-calculator', description: 'Calculate monthly payments for a loan.', emoji: '🏦', category: 'Finance' },
   { name: 'Lorem Ipsum', href: '/lorem-ipsum', description: 'Generate placeholder text.', emoji: '✍️', category: 'Text' },
   { name: 'Markdown Previewer', href: '/markdown-previewer', description: 'A real-time editor and previewer for Markdown.', emoji: '📝', category: 'Developers' },
+  { name: 'Meme Generator', href: '/meme-generator', description: 'Create your own custom memes with top and bottom text.', emoji: '😂', category: 'Tools' },
   { name: 'Memory Game', href: '/memory-game', description: 'A card-flipping game to test your memory.', emoji: '🧠', category: 'Games' },
   { name: 'Metric Converter', href: '/metric-converter', description: 'Convert length, weight, and volume.', emoji: '📏', category: 'Converters' },
   { name: 'Minesweeper', href: '/minesweeper', description: 'Play the classic game of Minesweeper.', emoji: '💣', category: 'Games' },
@@ -65,6 +68,7 @@ export const utilities: Utility[] = [
   { name: 'Text Case Converter', href: '/text-case-converter', description: 'Convert text between various casing conventions.', emoji: '🔡', category: 'Text' },
   { name: 'Text Diff Checker', href: '/text-diff', description: 'Compare two texts and highlight differences.', emoji: '🔀', category: 'Text' },
   { name: 'Text Sorter', href: '/text-sorter', description: 'Sort lines of text alphabetically or by length.', emoji: '⇅', category: 'Text' },
+  { name: 'Text Summarizer', href: '/text-summarizer', description: 'Get a concise summary of any long text using AI.', emoji: '✨', category: 'AI Tools' },
   { name: 'Tic Tac Toe', href: '/tic-tac-toe', description: 'Play a classic game of Tic Tac Toe.', emoji: '⭕', category: 'Games' },
   { name: 'Timezone Converter', href: '/timezone-converter', description: 'Quickly compare the time across different timezones.', emoji: '🌍', category: 'Time & Date' },
   { name: 'Tip Calculator', href: '/tip-calculator', description: 'Quickly calculate tips and split the bill.', emoji: '🧾', category: 'Math' },
