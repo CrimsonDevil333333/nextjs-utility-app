@@ -57,6 +57,12 @@ const CATEGORY_COLORS: Record<string, string> = {
   'All': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200'
 };
 
+// --- ✨ NEW: Define the desired category order ---
+const CATEGORY_ORDER = [
+    'Converters', 'Developers', 'Finance', 'Security', 'Design', 'Text',
+    'Time & Date', 'Math', 'Tools', 'Games', 'Health', 'Network', 'AI Tools'
+];
+
 export default function HomePageContent() {
   const router = useRouter();
   const pathname = usePathname();
@@ -79,10 +85,32 @@ export default function HomePageContent() {
     }, {} as Record<string, Utility[]>);
   }, []);
 
+  // --- ✨ NEW: Create a memoized, sorted list of categories ---
+  const sortedCategories = useMemo(() => {
+    const allCategories = Object.keys(groupedUtilities);
+    const orderMap = CATEGORY_ORDER.reduce((acc, cat, index) => {
+        acc[cat] = index;
+        return acc;
+    }, {} as Record<string, number>);
+
+    return allCategories.sort((a, b) => {
+        const orderA = a in orderMap ? orderMap[a] : Number.MAX_SAFE_INTEGER;
+        const orderB = b in orderMap ? orderMap[b] : Number.MAX_SAFE_INTEGER;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.localeCompare(b); // Fallback for unlisted categories
+    });
+  }, [groupedUtilities]);
+
+
+  // --- ✨ UPDATED: Generate filters based on the new sorted order ---
   useEffect(() => {
-    const categories = Object.keys(groupedUtilities).sort();
-    const filters = categories.map(category => {
+    if (sortedCategories.length === 0) return;
+
+    const filters = sortedCategories.map(category => {
       const utilsInCategory = groupedUtilities[category];
+      if (!utilsInCategory || utilsInCategory.length === 0) {
+        return { name: category, emoji: '❓' }; // Fallback for safety
+      }
       const randomUtil = utilsInCategory[Math.floor(Math.random() * utilsInCategory.length)];
       return {
         name: category,
@@ -90,7 +118,7 @@ export default function HomePageContent() {
       };
     });
     setDynamicFilterCategories([{ name: 'All', emoji: '🌟' }, ...filters]);
-  }, [groupedUtilities]);
+  }, [sortedCategories, groupedUtilities]);
 
 
   useEffect(() => {
@@ -165,22 +193,17 @@ export default function HomePageContent() {
     <main className="min-h-screen p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
       <div className="max-w-6xl mx-auto py-8">
         <header className="relative text-center mb-12 animate-fade-in">
-          {/* Parent Flex Container */}
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-2 sm:p-4">
-            {/* Left Item: Configuration */}
             <Link href="/config" title="Configuration">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-700 shadow-md transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                 <Settings className="h-5 w-5" />
               </div>
             </Link>
-
-            {/* Right Item: About Us */}
             <Link href="/about" title="About Us">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white shadow-md transition-colors hover:bg-blue-600">
                 <Info className="h-5 w-5" />
               </div>
             </Link>
-
           </div>
           <h1 className="text-4xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-4 tracking-tight">
             Dev Toolkit
@@ -212,7 +235,7 @@ export default function HomePageContent() {
                   key={cat.name}
                   onClick={() => setSelectedCategory(cat.name)}
                   className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105
-                       ${isSelected
+                                        ${isSelected
                       ? `${colorClasses} shadow-md`
                       : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
@@ -244,19 +267,24 @@ export default function HomePageContent() {
           </>
         ) : (
           <div className="space-y-8">
-            {Object.entries(groupedUtilities).map(([category, utils]) => (
-              <section key={category}>
-                <button onClick={() => toggleCategory(category)} className="w-full flex justify-between items-center text-left text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b-2 border-blue-500 dark:border-blue-400">
-                  <span>{category}</span>
-                  {expandedCategories[category] ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
-                </button>
-                <div className={`grid overflow-hidden transition-all duration-500 ease-in-out ${expandedCategories[category] ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-                  <div className="min-h-0 col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {utils.map(util => (<UtilityCard key={util.name} util={util} />))}
-                  </div>
-                </div>
-              </section>
-            ))}
+            {/* --- ✨ UPDATED: Render sections using the new sorted order --- */}
+            {sortedCategories.map((category) => {
+                const utils = groupedUtilities[category];
+                if (!utils || utils.length === 0) return null; // Don't render empty categories
+                return (
+                    <section key={category}>
+                    <button onClick={() => toggleCategory(category)} className="w-full flex justify-between items-center text-left text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b-2 border-blue-500 dark:border-blue-400">
+                        <span>{category}</span>
+                        {expandedCategories[category] ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+                    </button>
+                    <div className={`grid overflow-hidden transition-all duration-500 ease-in-out ${expandedCategories[category] ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                        <div className="min-h-0 col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {utils.map(util => (<UtilityCard key={util.name} util={util} />))}
+                        </div>
+                    </div>
+                    </section>
+                )
+            })}
           </div>
         )}
       </div>
