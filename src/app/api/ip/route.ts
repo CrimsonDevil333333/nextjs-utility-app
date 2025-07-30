@@ -1,6 +1,6 @@
-export const runtime = "edge";
-
 import { NextResponse } from 'next/server';
+
+export const runtime = 'edge'; // Required for Cloudflare Pages
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,7 +8,6 @@ export async function GET(request: Request) {
 
   // If no IP is provided, get the client's IP from the request headers
   if (!ip) {
-    // Prioritize Cloudflare's header, then fall back to standard headers
     ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     
     // For local development, you might not have these headers. Fallback to a known IP.

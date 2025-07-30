@@ -74,7 +74,7 @@ export const utilities: Utility[] = [
   { name: 'URL Parser/Builder', href: '/url-parser', description: 'Deconstruct or construct URLs.', emoji: '🌐', category: 'Developers' },
   { name: 'User-Agent Finder', href: '/user-agent', description: 'Parse your browser\'s User-Agent string.', emoji: '🕵️', category: 'Developers' },
   { name: 'UUID Generator', href: '/uuid-generator', description: 'Generate universally unique IDs.', emoji: '🆔', category: 'Developers' },
-  { name: 'WHOIS Lookup', href: '/whois-lookup', description: 'Find registration data for any domain.', emoji: '🔍', category: 'Network' },
+  // { name: 'WHOIS Lookup', href: '/whois-lookup', description: 'Find registration data for any domain.', emoji: '🔍', category: 'Network' },
   { name: 'Word Counter', href: '/word-counter', description: 'Count words, characters, and lines in text.', emoji: '📊', category: 'Text' },
   { name: 'Wordle Clone', href: '/wordle-clone', description: 'A simple version of the popular daily word game.', emoji: '🟩', category: 'Games' },
   { name: 'XML Formatter', href: '/xml-formatter', description: 'Beautify and view XML data.', emoji: '📜', category: 'Developers' },
