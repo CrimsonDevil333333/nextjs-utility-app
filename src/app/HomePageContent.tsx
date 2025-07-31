@@ -59,8 +59,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 // --- Define the desired category order ---
 const CATEGORY_ORDER = [
-  'Tools', 'Text', 'Time & Date', 'Converters', 'Math', 
-  'Design', 'Network', 'Security', 'Finance', 'Health', 
+  'Tools', 'Text', 'Time & Date', 'Converters', 'Math',
+  'Design', 'Network', 'Security', 'Finance', 'Health',
   'Developers', 'AI Tools', 'Games'
 ];
 
@@ -277,11 +277,12 @@ export default function HomePageContent() {
         </section>
 
         {/* Filter Modal for Mobile */}
-        <div className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${isFilterModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} >
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsFilterModalOpen(false)}></div>
+        <div className={`fixed inset-0 z-50 flex items-center justify-center ${isFilterModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} >
+          {/* This div will handle the instant blur and opacity transition for the overlay */}
+          <div className={`absolute inset-0 bg-black/20 ${isFilterModalOpen ? 'backdrop-blur-sm' : ''}`} onClick={() => setIsFilterModalOpen(false)}></div>
           <div
             className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-6 w-11/12 max-w-md border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out
-              ${isFilterModalOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
+      ${isFilterModalOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Select a Category</h3>
