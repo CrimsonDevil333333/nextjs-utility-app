@@ -24,7 +24,12 @@ function useDebounce<T>(value: T, delay: number): T {
 // Sub-component for individual utility cards
 function UtilityCard({ util }: { util: Utility }) {
   return (
-    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in" onClick={triggerHapticFeedback}>
+    <Link 
+      href={util.href} 
+      key={util.name} 
+      className="group block h-full animate-card-fade-in" 
+      onClick={triggerHapticFeedback}
+    >
       <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200 dark:border-gray-700 h-full flex flex-col justify-between">
         <div>
           <span className="text-4xl mb-4 block transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
@@ -201,6 +206,11 @@ export default function HomePageContent() {
     setIsFilterModalOpen(false);
     triggerHapticFeedback();
   };
+  
+  const handleMobileFilterButtonClick = () => {
+    setIsFilterModalOpen(true);
+    triggerHapticFeedback();
+  }
 
   // shouldShowContent should now correctly reflect if a filter is active or search term is present.
   const isFiltered = debouncedSearchTerm !== '' || (selectedCategory !== null && selectedCategory !== 'All');
@@ -214,12 +224,20 @@ export default function HomePageContent() {
       <div className="max-w-6xl mx-auto py-8">
         <header className="relative text-center mb-12 animate-fade-in">
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-2 sm:p-4">
-            <Link href="/config" title="Configuration">
+            <Link 
+              href="/config" 
+              title="Configuration"
+              onClick={triggerHapticFeedback}
+            >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-700 shadow-md transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                 <Settings className="h-5 w-5" />
               </div>
             </Link>
-            <Link href="/about" title="About Us">
+            <Link 
+              href="/about" 
+              title="About Us"
+              onClick={triggerHapticFeedback}
+            >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white shadow-md transition-colors hover:bg-blue-600">
                 <Info className="h-5 w-5" />
               </div>
@@ -253,7 +271,7 @@ export default function HomePageContent() {
               return (
                 <button
                   key={cat.name}
-                  onClick={() => setSelectedCategory(cat.name)}
+                  onClick={() => { setSelectedCategory(cat.name); triggerHapticFeedback(); }}
                   className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${isSelected ? `${colorClasses} shadow-md` : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                 >
                   <span>{cat.emoji}</span>
@@ -266,7 +284,7 @@ export default function HomePageContent() {
           {/* Mobile View: "Filter" button */}
           <div className="sm:hidden flex justify-center">
             <button
-              onClick={() => setIsFilterModalOpen(true)}
+              onClick={handleMobileFilterButtonClick}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 border
                 ${selectedCategory
                   ? `${CATEGORY_COLORS[selectedCategory] || CATEGORY_COLORS['All']} border-transparent shadow-md`
@@ -282,14 +300,14 @@ export default function HomePageContent() {
         {/* Filter Modal for Mobile */}
         <div className={`fixed inset-0 z-50 flex items-center justify-center ${isFilterModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} >
           {/* This div will handle the instant blur and opacity transition for the overlay */}
-          <div className={`absolute inset-0 bg-black/20 ${isFilterModalOpen ? 'backdrop-blur-sm' : ''}`} onClick={() => setIsFilterModalOpen(false)}></div>
+          <div className={`absolute inset-0 bg-black/20 ${isFilterModalOpen ? 'backdrop-blur-sm' : ''}`} onClick={() => { setIsFilterModalOpen(false); triggerHapticFeedback(); }}></div>
           <div
             className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-6 w-11/12 max-w-md border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out
       ${isFilterModalOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Select a Category</h3>
-              <button onClick={() => setIsFilterModalOpen(false)} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+              <button onClick={() => { setIsFilterModalOpen(false); triggerHapticFeedback(); }} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
                 <X className="w-6 h-6" />
               </button>
             </div>
