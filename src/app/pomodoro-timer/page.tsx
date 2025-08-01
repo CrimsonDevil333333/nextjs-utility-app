@@ -78,7 +78,7 @@ const PomodoroTimerPage = () => {
   const selectedModeClass = 'bg-gray-900/50 dark:bg-black/50 text-white';
 
   return (
-    <div className={`min-h-[calc(100vh-100px)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-500 ${mode === 'pomodoro' ? 'bg-red-100 dark:bg-red-900/50' :
+    <div className={`min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-500 ${mode === 'pomodoro' ? 'bg-red-100 dark:bg-red-900/50' :
         mode === 'shortBreak' ? 'bg-blue-100 dark:bg-blue-900/50' :
           'bg-green-100 dark:bg-green-900/50'
       }`}>

@@ -236,7 +236,7 @@ const TetrisPage = () => {
     }
 
     return (
-        <div className="min-h-[calc(100vh-100px)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
             <div className="w-full max-w-4xl mx-auto">
                 <div className="text-center mb-4">
                     <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">Tetris 🧱</h1>

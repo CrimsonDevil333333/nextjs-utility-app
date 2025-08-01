@@ -24,11 +24,15 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" />
       </head>
+      {/* Use flexbox on the body and set it to min-h-screen */}
       <body className={`flex flex-col min-h-screen ${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
         <Header />
         <HapticFeedbackModal />
-        <main className="flex-grow">{children}</main>
-        <footer /* ...footer content... */ ></footer>
+        {/* Use flex-grow to make the main content take up the remaining space */}
+        <main className="flex-grow overflow-y-auto">
+            {children}
+        </main>
+        <footer></footer>
       </body>
     </html>
   );
