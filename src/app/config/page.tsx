@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { KeyRound, Save, Check } from 'lucide-react';
+import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX } from 'lucide-react';
 
 type Agent = 'gemini' | 'openai';
 
 const ConfigPage = () => {
   const [apiKeys, setApiKeys] = useState<Record<Agent, string>>({ gemini: '', openai: '' });
   const [isKeySaved, setIsKeySaved] = useState(false);
+  const [hapticEnabled, setHapticEnabled] = useState(false);
+  const [hapticIntensity, setHapticIntensity] = useState(0.5);
 
   // Load existing keys from localStorage when the component mounts
   useEffect(() => {
@@ -15,11 +17,23 @@ const ConfigPage = () => {
     if (savedApiKeys) {
       setApiKeys(JSON.parse(savedApiKeys));
     }
+
+    const savedHaptic = localStorage.getItem('hapticFeedback');
+    if (savedHaptic) {
+      setHapticEnabled(JSON.parse(savedHaptic));
+    }
+
+    const savedIntensity = localStorage.getItem('hapticIntensity');
+    if (savedIntensity) {
+      setHapticIntensity(parseFloat(savedIntensity));
+    }
   }, []);
 
   // Save the updated keys to localStorage
   const handleSaveApiKeys = () => {
     localStorage.setItem('userApiKeys', JSON.stringify(apiKeys));
+    localStorage.setItem('hapticFeedback', JSON.stringify(hapticEnabled));
+    localStorage.setItem('hapticIntensity', hapticIntensity.toString());
     setIsKeySaved(true);
     setTimeout(() => setIsKeySaved(false), 2000); // Show confirmation message for 2 seconds
   };
@@ -32,10 +46,11 @@ const ConfigPage = () => {
     <div className="max-w-2xl mx-auto p-4 sm:p-6 mt-8">
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">Configuration</h1>
-        <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Manage your API keys for all AI-powered tools.</p>
+        <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Manage your API keys and application settings.</p>
       </div>
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 space-y-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white border-b pb-4">API Keys</h2>
         <div>
           <label htmlFor="geminiApiKey" className="block text-lg font-semibold text-gray-700 dark:text-gray-300">
             Gemini API Key
@@ -69,7 +84,46 @@ const ConfigPage = () => {
             />
           </div>
         </div>
+      </div>
 
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 space-y-6 mt-8">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white border-b pb-4">Haptic Feedback</h2>
+        <div className="flex items-center justify-between">
+          <label htmlFor="hapticToggle" className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+            Enable Haptic Feedback
+          </label>
+          <button
+            id="hapticToggle"
+            onClick={() => setHapticEnabled(!hapticEnabled)}
+            className={`p-2 rounded-full transition-colors ${hapticEnabled ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}>
+            {hapticEnabled ? <Zap size={20} /> : <ZapOff size={20} />}
+          </button>
+        </div>
+
+        {hapticEnabled && (
+          <div>
+            <label htmlFor="hapticIntensity" className="block text-lg font-semibold text-gray-700 dark:text-gray-300">
+              Intensity
+            </label>
+            <div className="flex items-center gap-4 mt-2">
+              <VolumeX size={20} className="text-gray-400" />
+              <input
+                id="hapticIntensity"
+                type="range"
+                min="0.1"
+                max="1"
+                step="0.1"
+                value={hapticIntensity}
+                onChange={(e) => setHapticIntensity(parseFloat(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              />
+              <Volume2 size={20} className="text-gray-400" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-8">
         <button
           onClick={handleSaveApiKeys}
           className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-lg text-white font-semibold transition-colors ${
@@ -77,7 +131,7 @@ const ConfigPage = () => {
           }`}
         >
           {isKeySaved ? <Check size={20} /> : <Save size={20} />}
-          {isKeySaved ? 'Keys Saved!' : 'Save All Keys'}
+          {isKeySaved ? 'Settings Saved!' : 'Save All Settings'}
         </button>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { Info, ChevronDown, ChevronUp, ArrowUp, Settings, X } from 'lucide-react
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { utilities, Utility } from '@/app/data/utilities';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 // --- Debounce Hook ---
 function useDebounce<T>(value: T, delay: number): T {
@@ -23,7 +24,7 @@ function useDebounce<T>(value: T, delay: number): T {
 // Sub-component for individual utility cards
 function UtilityCard({ util }: { util: Utility }) {
   return (
-    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in">
+    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in" onClick={triggerHapticFeedback}>
       <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200 dark:border-gray-700 h-full flex flex-col justify-between">
         <div>
           <span className="text-4xl mb-4 block transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
@@ -184,19 +185,21 @@ export default function HomePageContent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-  const toggleCategory = (category: string) => setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }));
+  const scrollToTop = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); triggerHapticFeedback(); };
+  const toggleCategory = (category: string) => { setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] })); triggerHapticFeedback(); };
   const setAllCategoriesExpanded = (isExpanded: boolean) => {
     const newState = Object.keys(groupedUtilities).reduce((acc, key) => {
       acc[key] = isExpanded;
       return acc;
     }, {} as Record<string, boolean>);
     setExpandedCategories(newState);
+    triggerHapticFeedback();
   };
 
   const handleFilterClick = (categoryName: string) => {
     setSelectedCategory(categoryName);
     setIsFilterModalOpen(false);
+    triggerHapticFeedback();
   };
 
   // shouldShowContent should now correctly reflect if a filter is active or search term is present.

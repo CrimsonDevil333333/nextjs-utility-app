@@ -1,7 +1,8 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
-import Header from './_components/Header'; 
+import Header from './_components/Header';
+import HapticFeedbackModal from '@/components/utility/HapticFeedbackModal'; 
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       </head>
       <body className={`flex flex-col min-h-screen ${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
         <Header />
+        <HapticFeedbackModal />
         <main className="flex-grow">{children}</main>
         <footer /* ...footer content... */ ></footer>
       </body>
