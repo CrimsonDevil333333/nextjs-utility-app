@@ -124,7 +124,7 @@ const ConnectFourPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none">
+    <main className="min-h-[calc(100vh-4rem)] bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none">
       <div className="flex flex-col items-center w-full max-w-lg mx-auto">
         <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-gray-200 mb-4">Connect Four</h1>
         <div className="bg-blue-600 p-2 sm:p-3 rounded-lg shadow-xl relative">

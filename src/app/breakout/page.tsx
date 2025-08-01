@@ -224,7 +224,7 @@ const BreakoutPage = () => {
 
 
   return (
-    <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-white font-sans">
+    <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-4rem)] text-gray-800 dark:text-white font-sans">
       <h1 className="text-4xl font-bold mb-2">Breakout 🧱</h1>
       <div className="flex justify-between w-full max-w-2xl mb-4 text-lg">
         <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">Score: {score}</span>

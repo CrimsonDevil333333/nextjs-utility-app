@@ -270,7 +270,7 @@ const ChessPage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center p-2 sm:p-4 bg-gray-50 dark:bg-gray-900 min-h-screen font-sans">
+    <div className="flex flex-col items-center p-2 sm:p-4 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-4rem)] font-sans">
       <div className="w-full flex justify-between items-center mb-4 max-w-4xl">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Chess ♟️</h1>
         <button onClick={initializeGame} className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow">

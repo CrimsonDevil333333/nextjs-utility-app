@@ -201,7 +201,7 @@ const SolitairePage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-2 sm:p-4 bg-green-800 dark:bg-green-900 min-h-screen font-sans">
+    <div className="flex flex-col items-center p-2 sm:p-4 bg-green-800 dark:bg-green-900 min-h-[calc(100vh-4rem)] font-sans">
       <div className="w-full flex justify-between items-center mb-2 sm:mb-4 max-w-7xl">
         <h1 className="text-xl sm:text-3xl font-bold text-white">Solitaire 🃏</h1>
         <div className="flex items-center gap-4">

@@ -185,7 +185,7 @@ export default function WordleClonePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex flex-col items-center justify-between p-2 sm:p-4 font-sans select-none">
+    <main className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex flex-col items-center justify-between p-2 sm:p-4 font-sans select-none">
       <header className="relative w-full text-center border-b border-gray-300 dark:border-gray-600 pb-2">
         <h1 className="text-4xl font-bold">Wordle</h1>
         {message && <div className="absolute top-12 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-md transition-opacity duration-300">{message}</div>}

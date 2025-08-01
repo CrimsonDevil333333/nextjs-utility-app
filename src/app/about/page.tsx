@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+    <main className="min-h-[calc(100vh-4rem)] p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
       <div className="max-w-4xl mx-auto py-8">
         <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-10 text-gray-900 dark:text-gray-100">
           About The Dev Toolkit

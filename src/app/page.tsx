@@ -4,7 +4,7 @@ import HomePageContent from '@/app/HomePageContent'; // Make sure the path is co
 // A simple skeleton loader to show while the main component loads
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+    <div className="min-h-[calc(100vh-4rem)] p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
       <div className="max-w-6xl mx-auto py-8 animate-pulse">
         {/* Header Skeleton */}
         <header className="text-center mb-12">
