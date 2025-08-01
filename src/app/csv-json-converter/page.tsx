@@ -1,59 +1,60 @@
-// app/csv-json-converter/page.tsx
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react'; // Import useEffect
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
-// Reusable CopyButton component (assuming it's available or define it here if not)
+// Reusable CopyButton component with haptic feedback
 function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel: string }) {
-    const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const handleCopy = useCallback(async () => {
-        if (valueToCopy) {
-            try {
-                await navigator.clipboard.writeText(valueToCopy);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-            }
-        }
-    }, [valueToCopy]);
+  const handleCopy = useCallback(async () => {
+    if (valueToCopy) {
+      try {
+        await navigator.clipboard.writeText(valueToCopy);
+        setCopied(true);
+        triggerHapticFeedback(); // Haptic feedback on successful copy
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+  }, [valueToCopy]);
 
-    const isValueEmpty = !valueToCopy;
+  const isValueEmpty = !valueToCopy;
 
-    return (
-        <button
-            onClick={handleCopy}
-            disabled={isValueEmpty}
-            className={`
+  return (
+    <button
+      onClick={handleCopy}
+      disabled={isValueEmpty}
+      className={`
                 px-4 py-2 text-sm font-medium rounded-md
                 flex items-center space-x-2
                 transition-all duration-200 ease-in-out
                 ${isValueEmpty
-                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
-                }
+          ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+          : 'bg-blue-500 hover:bg-blue-600 text-white shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
+        }
             `}
-            aria-label={ariaLabel}
-            title={ariaLabel}
-        >
-            {copied ? (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Copied!</span>
-                </>
-            ) : (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    <span>Copy</span>
-                </>
-            )}
-        </button>
-    );
+      aria-label={ariaLabel}
+      title={ariaLabel}
+    >
+      {copied ? (
+        <>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Copied!</span>
+        </>
+      ) : (
+        <>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          <span>Copy</span>
+        </>
+      )}
+    </button>
+  );
 }
 
 type Mode = 'csvToJson' | 'jsonToCsv';
@@ -81,18 +82,18 @@ export default function CsvJsonConverterPage() {
       for (let j = 0; j < headers.length; j++) {
         const key = headers[j];
         const rawValue = currentLine[j].trim();
-        
+
         // Basic type inference: try to convert to number, boolean, or null
         if (rawValue === 'true') {
-            obj[key] = true;
+          obj[key] = true;
         } else if (rawValue === 'false') {
-            obj[key] = false;
+          obj[key] = false;
         } else if (rawValue === 'null' || rawValue === '') { // Treat empty string as null
-            obj[key] = null;
+          obj[key] = null;
         } else if (!isNaN(Number(rawValue)) && !isNaN(parseFloat(rawValue))) {
-            obj[key] = Number(rawValue);
+          obj[key] = Number(rawValue);
         } else {
-            obj[key] = rawValue;
+          obj[key] = rawValue;
         }
       }
       result.push(obj);
@@ -152,7 +153,7 @@ export default function CsvJsonConverterPage() {
           if (value === null || typeof value === 'undefined') {
             return ''; // Represent null/undefined as empty string in CSV
           }
-          
+
           const stringValue = String(value);
 
           // Handle commas and quotes in values for CSV export
@@ -183,10 +184,11 @@ export default function CsvJsonConverterPage() {
       setError(e.message);
       return '';
     }
-  }, [input, mode]); // Only depends on input and mode
+  }, [input, mode]);
 
 
   const handleClear = useCallback(() => {
+    triggerHapticFeedback();
     setInput('');
     setError(null);
   }, []);
@@ -198,38 +200,38 @@ export default function CsvJsonConverterPage() {
     } else {
       setInput('[{"name":"John Doe","age":30,"city":"New York, USA","isStudent":true},{"name":"Jane Smith","age":25,"city":"London, UK","isStudent":false},{"name":"Peter Pan","age":null,"city":"Neverland","isStudent":""}]'); // Added complex JSON with comma in value, null, boolean, and empty string
     }
-  }, [mode]); // Dependency on mode ensures it updates when mode changes
+  }, [mode]);
 
 
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">CSV & JSON Converter</h1>
-      
+
       <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
         {/* Mode Switch */}
         <div className="flex justify-center mb-6">
           <div className="p-1 bg-gray-200 dark:bg-gray-700 rounded-lg flex space-x-1 shadow-inner">
             <button
-              onClick={() => setMode('csvToJson')}
+              onClick={() => { setMode('csvToJson'); triggerHapticFeedback(); }}
               className={`
-                px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
-                ${mode === 'csvToJson'
+                                px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
+                                ${mode === 'csvToJson'
                   ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }
-              `}
+                            `}
             >
               CSV to JSON
             </button>
             <button
-              onClick={() => setMode('jsonToCsv')}
+              onClick={() => { setMode('jsonToCsv'); triggerHapticFeedback(); }}
               className={`
-                px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
-                ${mode === 'jsonToCsv'
+                                px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
+                                ${mode === 'jsonToCsv'
                   ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }
-              `}
+                            `}
             >
               JSON to CSV
             </button>
@@ -252,17 +254,18 @@ export default function CsvJsonConverterPage() {
               <textarea
                 id="input-data"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onFocus={triggerHapticFeedback}
+                onChange={(e) => { setInput(e.target.value); triggerHapticFeedback(); }}
                 placeholder={mode === 'csvToJson' ? 'e.g., name,age,city\nJohn Doe,30,"New York, USA"' : 'e.g., [{"name":"Alice", "age":30}]'}
                 rows={10}
                 className={`
-                  w-full p-2.5 font-mono text-sm border rounded-lg resize-y
-                  bg-gray-50 dark:bg-gray-700 dark:border-gray-600
-                  text-gray-900 dark:text-gray-100
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  transition-all duration-200 ease-in-out
-                  ${error ? 'border-red-500 ring-red-500' : ''}
-                `}
+                                    w-full p-2.5 font-mono text-sm border rounded-lg resize-y
+                                    bg-gray-50 dark:bg-gray-700 dark:border-gray-600
+                                    text-gray-900 dark:text-gray-100
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    transition-all duration-200 ease-in-out
+                                    ${error ? 'border-red-500 ring-red-500' : ''}
+                                `}
               />
               <button
                 onClick={handleClear}
@@ -289,13 +292,13 @@ export default function CsvJsonConverterPage() {
                 placeholder="Converted data will appear here..."
                 rows={10}
                 className={`
-                  w-full p-2.5 font-mono text-sm border rounded-lg resize-y
-                  bg-gray-100 dark:bg-gray-900 dark:border-gray-700
-                  text-gray-800 dark:text-gray-200
-                  cursor-default select-all /* Added select-all */
-                  focus:outline-none
-                  ${error ? 'border-red-500 ring-red-500' : ''}
-                `}
+                                    w-full p-2.5 font-mono text-sm border rounded-lg resize-y
+                                    bg-gray-100 dark:bg-gray-900 dark:border-gray-700
+                                    text-gray-800 dark:text-gray-200
+                                    cursor-default select-all /* Added select-all */
+                                    focus:outline-none
+                                    ${error ? 'border-red-500 ring-red-500' : ''}
+                                `}
               />
               <div className="absolute top-3 right-3">
                 <CopyButton valueToCopy={output} ariaLabel="Copy converted data" />

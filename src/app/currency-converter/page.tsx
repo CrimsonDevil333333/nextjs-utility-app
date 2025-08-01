@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 const API_URL = 'https://api.frankfurter.app/latest';
 
@@ -12,7 +13,7 @@ export default function CurrencyConverterPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [fromSearch, setFromSearch] = useState('');
   const [toSearch, setToSearch] = useState('');
-  
+
   useEffect(() => {
     async function fetchRates() {
       try {
@@ -33,7 +34,7 @@ export default function CurrencyConverterPage() {
   const filteredFromCurrencyOptions = useMemo(() => {
     if (!fromSearch) return allCurrencyOptions;
     const lowerCaseSearch = fromSearch.toLowerCase();
-    return allCurrencyOptions.filter(currency => 
+    return allCurrencyOptions.filter(currency =>
       currency.toLowerCase().includes(lowerCaseSearch)
     );
   }, [fromSearch, allCurrencyOptions]);
@@ -41,7 +42,7 @@ export default function CurrencyConverterPage() {
   const filteredToCurrencyOptions = useMemo(() => {
     if (!toSearch) return allCurrencyOptions;
     const lowerCaseSearch = toSearch.toLowerCase();
-    return allCurrencyOptions.filter(currency => 
+    return allCurrencyOptions.filter(currency =>
       currency.toLowerCase().includes(lowerCaseSearch)
     );
   }, [toSearch, allCurrencyOptions]);
@@ -53,27 +54,28 @@ export default function CurrencyConverterPage() {
 
     const valueInBase = value / rates[fromCurrency];
     const convertedValue = valueInBase * rates[toCurrency];
-    
+
     try {
-        return convertedValue; // Return raw number for internal calculations
+      return convertedValue; // Return raw number for internal calculations
     } catch (e) {
-        console.error("Currency conversion error:", e);
-        return NaN;
+      console.error("Currency conversion error:", e);
+      return NaN;
     }
   }, [amount, fromCurrency, toCurrency, rates]);
 
   const displayResult = useMemo(() => {
     if (isNaN(result as number)) return '...';
     try {
-        return (result as number).toLocaleString(undefined, { style: 'currency', currency: toCurrency, maximumFractionDigits: 4 });
+      return (result as number).toLocaleString(undefined, { style: 'currency', currency: toCurrency, maximumFractionDigits: 4 });
     } catch (e) {
-        console.error("Currency formatting error:", e);
-        return (result as number).toLocaleString(undefined, { maximumFractionDigits: 4 });
+      console.error("Currency formatting error:", e);
+      return (result as number).toLocaleString(undefined, { maximumFractionDigits: 4 });
     }
   }, [result, toCurrency]);
 
 
   const handleReverse = useCallback(() => {
+    triggerHapticFeedback();
     const currentFrom = fromCurrency;
     const currentTo = toCurrency;
     const currentResultValue = result;
@@ -92,7 +94,7 @@ export default function CurrencyConverterPage() {
 
   }, [fromCurrency, toCurrency, result]);
 
-  
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-100px)] text-center text-lg text-gray-700 dark:text-gray-300">
@@ -117,51 +119,55 @@ export default function CurrencyConverterPage() {
               id="from-curr-amount"
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onFocus={triggerHapticFeedback}
+              onChange={(e) => { setAmount(e.target.value); triggerHapticFeedback(); }}
               placeholder="Enter amount"
               className="
-                w-full rounded-md border border-gray-300 dark:border-gray-600
-                bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 ease-in-out
-                text-base
-              "
+                                w-full rounded-md border border-gray-300 dark:border-gray-600
+                                bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
+                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 ease-in-out
+                                text-base
+                            "
             />
 
             {/* From Currency Search Input */}
             <label htmlFor="from-curr-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-2">Search From Currency</label>
             <input
-                id="from-curr-search"
-                type="text"
-                value={fromSearch}
-                onChange={(e) => {
-                    setFromSearch(e.target.value);
-                    if (!e.target.value && !allCurrencyOptions.includes(fromCurrency)) {
-                        setFromCurrency('USD');
-                    }
-                }}
-                placeholder="e.g., USD, EUR"
-                className="
-                    w-full rounded-md border border-gray-300 dark:border-gray-600
-                    bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                    dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 ease-in-out
-                    text-base
-                "
+              id="from-curr-search"
+              type="text"
+              value={fromSearch}
+              onFocus={triggerHapticFeedback}
+              onChange={(e) => {
+                setFromSearch(e.target.value);
+                triggerHapticFeedback();
+                if (!e.target.value && !allCurrencyOptions.includes(fromCurrency)) {
+                  setFromCurrency('USD');
+                }
+              }}
+              placeholder="e.g., USD, EUR"
+              className="
+                                    w-full rounded-md border border-gray-300 dark:border-gray-600
+                                    bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 ease-in-out
+                                    text-base
+                                "
             />
 
             <div className="relative mt-3">
               <select
                 id="from-curr"
                 value={fromCurrency}
-                onChange={(e) => setFromCurrency(e.target.value)}
+                onFocus={triggerHapticFeedback}
+                onChange={(e) => { setFromCurrency(e.target.value); triggerHapticFeedback(); }}
                 className="
-                  block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-600
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 pl-3 pr-10
-                  focus:outline-none focus:ring-2 focus:ring-blue-500
-                  dark:focus:ring-blue-400 transition-all duration-200 ease-in-out
-                  cursor-pointer text-base
-                "
+                                    block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-600
+                                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 pl-3 pr-10
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    dark:focus:ring-blue-400 transition-all duration-200 ease-in-out
+                                    cursor-pointer text-base
+                                "
               >
                 {filteredFromCurrencyOptions.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -173,32 +179,32 @@ export default function CurrencyConverterPage() {
               </div>
             </div>
           </div>
-          
+
           {/* Equals Sign & Reverse Button */}
           <div className="text-center flex flex-col justify-center items-center h-full sm:col-span-1">
             <div className="text-3xl font-bold text-gray-600 dark:text-gray-400 mb-4 sm:mb-0">=</div>
             <button
-                onClick={handleReverse}
-                className="
-                    inline-flex items-center justify-center p-2 rounded-full border border-gray-300 dark:border-gray-600
-                    bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
-                    hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500
-                    dark:focus:ring-blue-400 transition-all duration-200 ease-in-out
-                    w-10 h-10
-                "
-                aria-label="Reverse currencies"
+              onClick={handleReverse}
+              className="
+                                    inline-flex items-center justify-center p-2 rounded-full border border-gray-300 dark:border-gray-600
+                                    bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300
+                                    hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    dark:focus:ring-blue-400 transition-all duration-200 ease-in-out
+                                    w-10 h-10
+                                "
+              aria-label="Reverse currencies"
             >
-                {/* SVG ICON WITH RESPONSIVE ROTATION */}
-                <svg 
-                    className="w-5 h-5 rotate-0 sm:rotate-90 transition-transform duration-300" // Apply rotation responsively
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24" 
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7l4-4m0 0l4 4m-4-4v18"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 17l-4 4m0 0l-4-4m4 4V3"></path>
-                </svg>
+              {/* SVG ICON WITH RESPONSIVE ROTATION */}
+              <svg
+                className="w-5 h-5 rotate-0 sm:rotate-90 transition-transform duration-300" // Apply rotation responsively
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7l4-4m0 0l4 4m-4-4v18"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 17l-4 4m0 0l-4-4m4 4V3"></path>
+              </svg>
             </button>
           </div>
 
@@ -207,12 +213,12 @@ export default function CurrencyConverterPage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Converted Amount</label>
             <div
               className="
-                w-full rounded-md border border-gray-300 dark:border-gray-600
-                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
-                font-mono text-lg font-semibold
-                flex items-center justify-between min-h-[42px]
-                transition-all duration-200 ease-in-out
-              "
+                                w-full rounded-md border border-gray-300 dark:border-gray-600
+                                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
+                                font-mono text-lg font-semibold
+                                flex items-center justify-between min-h-[42px]
+                                transition-all duration-200 ease-in-out
+                            "
             >
               {displayResult}
             </div>
@@ -220,36 +226,39 @@ export default function CurrencyConverterPage() {
             {/* To Currency Search Input */}
             <label htmlFor="to-curr-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-2">Search To Currency</label>
             <input
-                id="to-curr-search"
-                type="text"
-                value={toSearch}
-                onChange={(e) => {
-                    setToSearch(e.target.value);
-                    if (!e.target.value && !allCurrencyOptions.includes(toCurrency)) {
-                        setToCurrency('EUR');
-                    }
-                }}
-                placeholder="e.g., INR, JPY"
-                className="
-                    w-full rounded-md border border-gray-300 dark:border-gray-600
-                    bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                    dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 ease-in-out
-                    text-base
-                "
+              id="to-curr-search"
+              type="text"
+              value={toSearch}
+              onFocus={triggerHapticFeedback}
+              onChange={(e) => {
+                setToSearch(e.target.value);
+                triggerHapticFeedback();
+                if (!e.target.value && !allCurrencyOptions.includes(toCurrency)) {
+                  setToCurrency('EUR');
+                }
+              }}
+              placeholder="e.g., INR, JPY"
+              className="
+                                    w-full rounded-md border border-gray-300 dark:border-gray-600
+                                    bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 px-3
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200 ease-in-out
+                                    text-base
+                                "
             />
 
             <div className="relative mt-3">
               <select
                 value={toCurrency}
-                onChange={(e) => setToCurrency(e.target.value)}
+                onFocus={triggerHapticFeedback}
+                onChange={(e) => { setToCurrency(e.target.value); triggerHapticFeedback(); }}
                 className="
-                  block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-600
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 pl-3 pr-10
-                  focus:outline-none focus:ring-2 focus:ring-blue-500
-                  dark:focus:ring-blue-400 transition-all duration-200 ease-in-out
-                  cursor-pointer text-base
-                "
+                                    block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-600
+                                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2.5 pl-3 pr-10
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    dark:focus:ring-blue-400 transition-all duration-200 ease-in-out
+                                    cursor-pointer text-base
+                                "
               >
                 {filteredToCurrencyOptions.map(c => <option key={c} value={c}>{c}</option>)}
               </select>

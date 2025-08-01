@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 // --- Game Constants ---
 const PADDLE_HEIGHT = 15;
@@ -44,7 +45,7 @@ const BreakoutPage = () => {
       dy: -3
     });
   }, []);
-  
+
   const resetGame = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -79,7 +80,7 @@ const BreakoutPage = () => {
     setGameState('start');
     resetLevel(canvas);
   }, [resetLevel]);
-  
+
   // Initialize and handle window resizing
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -102,12 +103,12 @@ const BreakoutPage = () => {
     if (!canvas || gameState !== 'playing') return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     let animationFrameId: number;
 
     const gameLoop = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       // Draw elements
       bricks.forEach(brick => {
         if (brick.isAlive) {
@@ -129,7 +130,7 @@ const BreakoutPage = () => {
       ctx.fillStyle = paddleGradient;
       ctx.fillRect(paddleX, canvas.height - PADDLE_HEIGHT, paddleWidth, PADDLE_HEIGHT);
       ctx.closePath();
-      
+
       ctx.beginPath();
       const ballGradient = ctx.createRadialGradient(ball.x, ball.y, BALL_RADIUS / 2, ball.x, ball.y, BALL_RADIUS);
       ballGradient.addColorStop(0, 'white');
@@ -153,7 +154,7 @@ const BreakoutPage = () => {
             setLives(l => l - 1);
             if (lives - 1 <= 0) {
               setGameState('over');
-              if(score > highScore) localStorage.setItem('breakoutHighScore', score.toString());
+              if (score > highScore) localStorage.setItem('breakoutHighScore', score.toString());
             } else {
               resetLevel(canvas);
               setGameState('paused');
@@ -161,23 +162,23 @@ const BreakoutPage = () => {
             return prevBall; // Return old state before resetting position
           }
         }
-        
+
         // Brick collision
         setBricks(prevBricks => {
-            const newBricks = [...prevBricks];
-            newBricks.forEach(brick => {
-                if(brick.isAlive && newBall.x > brick.x && newBall.x < brick.x + brick.width && newBall.y > brick.y && newBall.y < brick.y + brick.height) {
-                    newBall.dy = -newBall.dy;
-                    brick.isAlive = false;
-                    setScore(s => s + 10);
-                }
-            });
-            return newBricks;
+          const newBricks = [...prevBricks];
+          newBricks.forEach(brick => {
+            if (brick.isAlive && newBall.x > brick.x && newBall.x < brick.x + brick.width && newBall.y > brick.y && newBall.y < brick.y + brick.height) {
+              newBall.dy = -newBall.dy;
+              brick.isAlive = false;
+              setScore(s => s + 10);
+            }
+          });
+          return newBricks;
         });
 
         if (bricks.every(b => !b.isAlive)) {
-            setGameState('won');
-            if(score > highScore) localStorage.setItem('breakoutHighScore', score.toString());
+          setGameState('won');
+          if (score > highScore) localStorage.setItem('breakoutHighScore', score.toString());
         }
 
         newBall.x += newBall.dx;
@@ -203,53 +204,54 @@ const BreakoutPage = () => {
   };
 
   const handlePlayPause = () => {
-      if (gameState === 'start' || gameState === 'paused') setGameState('playing');
-      else if (gameState === 'playing') setGameState('paused');
-      else if (gameState === 'over' || gameState === 'won') resetGame();
+    if (gameState === 'start' || gameState === 'paused') setGameState('playing');
+    else if (gameState === 'playing') setGameState('paused');
+    else if (gameState === 'over' || gameState === 'won') resetGame();
+    triggerHapticFeedback();
   }
 
   // Keyboard controls
   useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-          if (e.key === ' ' || e.key === 'Enter') {
-              e.preventDefault();
-              handlePlayPause();
-          }
-      };
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        handlePlayPause();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState]);
 
 
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-white font-sans">
-        <h1 className="text-4xl font-bold mb-2">Breakout 🧱</h1>
-        <div className="flex justify-between w-full max-w-2xl mb-4 text-lg">
-            <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">Score: {score}</span>
-            <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">High Score: {highScore}</span>
-            <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">Lives: {lives}</span>
-        </div>
-        <div 
-            className="w-full max-w-2xl aspect-[4/3] relative cursor-none"
-            onMouseMove={(e) => handlePointerMove(e.clientX)}
-            onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
-        >
-            <canvas ref={canvasRef} className="w-full h-full bg-slate-800 rounded-lg shadow-2xl"></canvas>
-            
-            {gameState !== 'playing' && (
-                <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center rounded-lg backdrop-blur-sm cursor-default">
-                    {gameState === 'over' && <p className="text-5xl font-extrabold text-white">Game Over</p>}
-                    {gameState === 'won' && <p className="text-5xl font-extrabold text-white">You Win!</p>}
-                    <button onClick={handlePlayPause} className="mt-6 px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 text-xl shadow-lg">
-                        {
-                           gameState === 'start' ? 'Start Game' :
-                           gameState === 'paused' ? 'Resume' : 'Play Again'
-                        }
-                    </button>
-                    {gameState === 'start' && <p className="mt-4 text-sm text-gray-300">Move mouse or drag anywhere to control paddle.</p>}
-                </div>
-            )}
-        </div>
+      <h1 className="text-4xl font-bold mb-2">Breakout 🧱</h1>
+      <div className="flex justify-between w-full max-w-2xl mb-4 text-lg">
+        <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">Score: {score}</span>
+        <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">High Score: {highScore}</span>
+        <span className="px-3 py-1 bg-white/10 dark:bg-black/20 rounded-full">Lives: {lives}</span>
+      </div>
+      <div
+        className="w-full max-w-2xl aspect-[4/3] relative cursor-none"
+        onMouseMove={(e) => handlePointerMove(e.clientX)}
+        onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
+      >
+        <canvas ref={canvasRef} className="w-full h-full bg-slate-800 rounded-lg shadow-2xl"></canvas>
+
+        {gameState !== 'playing' && (
+          <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center rounded-lg backdrop-blur-sm cursor-default">
+            {gameState === 'over' && <p className="text-5xl font-extrabold text-white">Game Over</p>}
+            {gameState === 'won' && <p className="text-5xl font-extrabold text-white">You Win!</p>}
+            <button onClick={handlePlayPause} className="mt-6 px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 text-xl shadow-lg">
+              {
+                gameState === 'start' ? 'Start Game' :
+                  gameState === 'paused' ? 'Resume' : 'Play Again'
+              }
+            </button>
+            {gameState === 'start' && <p className="mt-4 text-sm text-gray-300">Move mouse or drag anywhere to control paddle.</p>}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

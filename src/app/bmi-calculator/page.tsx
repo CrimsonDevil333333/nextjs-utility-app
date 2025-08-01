@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 // Constants for conversion
 const KG_TO_LBS = 2.20462;
@@ -62,7 +63,7 @@ const BmiCalculatorPage = () => {
 
       const percent = ((bmiValue - BMI_RANGE.min) / (BMI_RANGE.max - BMI_RANGE.min)) * 100;
       const gaugePercentage = Math.max(0, Math.min(100, percent));
-      
+
       if (bmiValue < 18.5) return { bmi: bmiValue.toFixed(1), category: 'Underweight', color: 'text-blue-500', gaugePercentage };
       if (bmiValue < 25) return { bmi: bmiValue.toFixed(1), category: 'Normal', color: 'text-green-500', gaugePercentage };
       if (bmiValue < 30) return { bmi: bmiValue.toFixed(1), category: 'Overweight', color: 'text-yellow-500', gaugePercentage };
@@ -80,8 +81,8 @@ const BmiCalculatorPage = () => {
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white">BMI Calculator 💪</h1>
 
       <div className="flex justify-center mb-6 bg-gray-200 dark:bg-gray-700 p-1 rounded-full">
-        <button onClick={() => setUnit('metric')} className={`w-1/2 py-2 rounded-full transition-all ${unit === 'metric' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>Metric</button>
-        <button onClick={() => setUnit('imperial')} className={`w-1/2 py-2 rounded-full transition-all ${unit === 'imperial' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>Imperial</button>
+        <button onClick={() => { setUnit('metric'); triggerHapticFeedback(); }} className={`w-1/2 py-2 rounded-full transition-all ${unit === 'metric' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>Metric</button>
+        <button onClick={() => { setUnit('imperial'); triggerHapticFeedback(); }} className={`w-1/2 py-2 rounded-full transition-all ${unit === 'imperial' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>Imperial</button>
       </div>
 
       <div className="space-y-4">
@@ -113,7 +114,7 @@ const BmiCalculatorPage = () => {
           <span>Normal</span>
           <span>Overweight</span>
         </div>
-        
+
         <p className="text-lg text-gray-600 dark:text-gray-300 mt-6">Your BMI is</p>
         <p className={`text-6xl font-extrabold my-1 ${color}`}>{bmi}</p>
         <p className={`text-xl font-semibold ${color}`}>{category}</p>

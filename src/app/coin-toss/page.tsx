@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 export default function CoinTossPage() {
   const [result, setResult] = useState('');
@@ -9,6 +10,7 @@ export default function CoinTossPage() {
   const tossCoin = () => {
     setIsFlipping(true);
     setResult('');
+    triggerHapticFeedback();
     setTimeout(() => {
       const random = Math.random();
       if (random < 0.5) {

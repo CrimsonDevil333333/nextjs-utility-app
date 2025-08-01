@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { BarChart2, LineChart as LineChartIcon, PieChart as PieChartIcon } from 'lucide-react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 // --- Types and Constants ---
 type ChartType = 'bar' | 'line' | 'pie';
@@ -27,7 +28,7 @@ const ChartMakerPage = () => {
       entry[header[1]] = parseFloat(values[1]);
       return entry;
     });
-    
+
     return { data, keys: header };
   }, [rawData, hasHeader]);
 
@@ -44,7 +45,7 @@ const ChartMakerPage = () => {
         </BarChart>
       );
     }
-    
+
     const [nameKey, dataKey] = parsedData.keys;
 
     switch (chartType) {
@@ -107,14 +108,14 @@ const ChartMakerPage = () => {
         {/* Controls Panel */}
         <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold mb-4">Controls</h2>
-          
+
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Chart Type</label>
               <div className="flex gap-2">
-                <button onClick={() => setChartType('bar')} className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 transition ${chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}><BarChart2 size={18}/> Bar</button>
-                <button onClick={() => setChartType('line')} className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 transition ${chartType === 'line' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}><LineChartIcon size={18}/> Line</button>
-                <button onClick={() => setChartType('pie')} className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 transition ${chartType === 'pie' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}><PieChartIcon size={18}/> Pie</button>
+                <button onClick={() => { setChartType('bar'); triggerHapticFeedback(); }} className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 transition ${chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}><BarChart2 size={18} /> Bar</button>
+                <button onClick={() => { setChartType('line'); triggerHapticFeedback(); }} className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 transition ${chartType === 'line' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}><LineChartIcon size={18} /> Line</button>
+                <button onClick={() => { setChartType('pie'); triggerHapticFeedback(); }} className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 transition ${chartType === 'pie' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}><PieChartIcon size={18} /> Pie</button>
               </div>
             </div>
 
@@ -128,7 +129,7 @@ const ChartMakerPage = () => {
                 placeholder="Label,Value&#10;Item A,10&#10;Item B,20"
               />
             </div>
-            
+
             <div className="flex items-center">
               <input
                 id="hasHeader"

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 const CompoundInterestCalculatorPage = () => {
     const [principal, setPrincipal] = useState<string>('10000');
@@ -43,19 +44,19 @@ const CompoundInterestCalculatorPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label htmlFor="principal" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Initial Principal ($)</label>
-                        <input type="number" id="principal" value={principal} onChange={(e) => setPrincipal(e.target.value)} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        <input type="number" id="principal" value={principal} onFocus={triggerHapticFeedback} onChange={(e) => { setPrincipal(e.target.value); triggerHapticFeedback(); }} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
                     </div>
                     <div>
                         <label htmlFor="rate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Annual Interest Rate (%)</label>
-                        <input type="number" id="rate" value={rate} onChange={(e) => setRate(e.target.value)} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        <input type="number" id="rate" value={rate} onFocus={triggerHapticFeedback} onChange={(e) => { setRate(e.target.value); triggerHapticFeedback(); }} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
                     </div>
                     <div>
                         <label htmlFor="years" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Investment Term (Years)</label>
-                        <input type="number" id="years" value={years} onChange={(e) => setYears(e.target.value)} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        <input type="number" id="years" value={years} onFocus={triggerHapticFeedback} onChange={(e) => { setYears(e.target.value); triggerHapticFeedback(); }} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
                     </div>
                     <div>
                         <label htmlFor="monthly" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Contribution ($)</label>
-                        <input type="number" id="monthly" value={monthlyContribution} onChange={(e) => setMonthlyContribution(e.target.value)} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        <input type="number" id="monthly" value={monthlyContribution} onFocus={triggerHapticFeedback} onChange={(e) => { setMonthlyContribution(e.target.value); triggerHapticFeedback(); }} className="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
                     </div>
                 </div>
 
@@ -65,7 +66,7 @@ const CompoundInterestCalculatorPage = () => {
                         <p className="text-lg text-gray-600 dark:text-gray-300">Future Value</p>
                         <p className="text-4xl sm:text-5xl font-extrabold my-2 text-green-600 dark:text-green-400">{futureValue}</p>
                     </div>
-                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
                         <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Contributions</p>
                             <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">{totalContribution}</p>

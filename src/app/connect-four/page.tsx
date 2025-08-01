@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 const ROWS = 6;
 const COLS = 7;
@@ -13,17 +14,18 @@ const ConnectFourPage = () => {
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [winner, setWinner] = useState<number | 'draw' | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  
+
   /**
    * Resets the game to its initial state.
    */
   const resetGame = () => {
+    triggerHapticFeedback();
     setBoard(createEmptyBoard());
     setCurrentPlayer(1);
     setWinner(null);
     setGameOver(false);
   };
-  
+
   /**
    * Checks for a win condition (four in a row, column, or diagonal).
    * @param currentBoard The current game board.
@@ -34,7 +36,7 @@ const ConnectFourPage = () => {
     const checkLine = (a: number, b: number, c: number, d: number) => {
       return a !== 0 && a === b && a === c && a === d;
     };
-    
+
     // Check horizontal lines
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c <= COLS - 4; c++) {
@@ -70,10 +72,10 @@ const ConnectFourPage = () => {
         }
       }
     }
-    
+
     // Check for a draw (if board is full)
     if (currentBoard.flat().every(cell => cell !== 0)) {
-        return 'draw';
+      return 'draw';
     }
 
     return null; // No winner yet
@@ -89,8 +91,10 @@ const ConnectFourPage = () => {
       return;
     }
 
+    triggerHapticFeedback();
+
     const newBoard = board.map(row => [...row]);
-    
+
     // Find the first empty row from the bottom in the selected column.
     for (let r = ROWS - 1; r >= 0; r--) {
       if (newBoard[r][colIndex] === 0) {
@@ -98,9 +102,9 @@ const ConnectFourPage = () => {
         break;
       }
     }
-    
+
     setBoard(newBoard);
-    
+
     // Check for a winner after the move.
     const newWinner = checkForWin(newBoard);
     if (newWinner) {
@@ -121,39 +125,39 @@ const ConnectFourPage = () => {
 
   return (
     <main className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none">
-       <div className="flex flex-col items-center w-full max-w-lg mx-auto">
-         <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-gray-200 mb-4">Connect Four</h1>
-         <div className="bg-blue-600 p-2 sm:p-3 rounded-lg shadow-xl relative">
-            {gameOver && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 rounded-lg text-center p-4">
-                    <p className="text-5xl font-extrabold text-white">
-                        {winner === 'draw' ? 'Draw!' : `Player ${winner} Wins!`}
-                    </p>
-                    <button onClick={resetGame} className="mt-6 px-6 py-3 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors text-lg">
-                        Play Again
-                    </button>
-                </div>
-            )}
-            <div className="grid grid-cols-7 gap-1 sm:gap-2">
-              {board.flat().map((cell, index) => {
-                 const colIndex = index % COLS;
-                 return (
-                    <div
-                      key={index}
-                      className="w-10 h-10 sm:w-16 sm:h-16 flex items-center justify-center cursor-pointer group"
-                      onClick={() => handleColumnClick(colIndex)}
-                    >
-                       <div className={`w-full h-full rounded-full transition-all duration-200 ${getPlayerColor(cell)} group-hover:bg-opacity-70 shadow-inner`}></div>
-                    </div>
-                 )
-              })}
+      <div className="flex flex-col items-center w-full max-w-lg mx-auto">
+        <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-gray-200 mb-4">Connect Four</h1>
+        <div className="bg-blue-600 p-2 sm:p-3 rounded-lg shadow-xl relative">
+          {gameOver && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 rounded-lg text-center p-4">
+              <p className="text-5xl font-extrabold text-white">
+                {winner === 'draw' ? 'Draw!' : `Player ${winner} Wins!`}
+              </p>
+              <button onClick={resetGame} className="mt-6 px-6 py-3 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors text-lg">
+                Play Again
+              </button>
             </div>
-         </div>
-         {!gameOver && (
-            <p className="mt-4 text-2xl font-semibold text-gray-700 dark:text-gray-300">
-                Player {currentPlayer}'s Turn
-            </p>
-         )}
+          )}
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
+            {board.flat().map((cell, index) => {
+              const colIndex = index % COLS;
+              return (
+                <div
+                  key={index}
+                  className="w-10 h-10 sm:w-16 sm:h-16 flex items-center justify-center cursor-pointer group"
+                  onClick={() => handleColumnClick(colIndex)}
+                >
+                  <div className={`w-full h-full rounded-full transition-all duration-200 ${getPlayerColor(cell)} group-hover:bg-opacity-70 shadow-inner`}></div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        {!gameOver && (
+          <p className="mt-4 text-2xl font-semibold text-gray-700 dark:text-gray-300">
+            Player {currentPlayer}'s Turn
+          </p>
+        )}
       </div>
     </main>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 const GRID_SIZE = 4;
 const TILE_COLORS: { [key: number]: string } = {
@@ -55,6 +56,7 @@ const Game2048Page = () => {
     setBoard(newBoard);
     setScore(0);
     setGameOver(false);
+    triggerHapticFeedback();
   }, [addRandomTile]);
 
   useEffect(() => {
@@ -99,7 +101,7 @@ const Game2048Page = () => {
     }
     return newBoard;
   };
-  
+
   // A single move operation (left, right, up, or down)
   const performMove = useCallback((direction: 'left' | 'right' | 'up' | 'down') => {
     if (gameOver) return;
@@ -113,7 +115,7 @@ const Game2048Page = () => {
     for (let i = 0; i < rotations[direction]; i++) {
       currentBoard = rotateClockwise(currentBoard);
     }
-    
+
     // Slide and merge
     for (let i = 0; i < GRID_SIZE; i++) {
       const { newRow, mergedScore } = slideAndCombine(currentBoard[i]);
@@ -123,7 +125,7 @@ const Game2048Page = () => {
 
     // Rotate back
     for (let i = 0; i < (4 - rotations[direction]) % 4; i++) {
-        currentBoard = rotateClockwise(currentBoard);
+      currentBoard = rotateClockwise(currentBoard);
     }
 
     setScore(s => s + totalMergedScore);
@@ -131,25 +133,26 @@ const Game2048Page = () => {
     // Add a new tile if the board changed
     if (!areBoardsEqual(originalBoard, currentBoard)) {
       currentBoard = addRandomTile(currentBoard);
+      triggerHapticFeedback();
     }
-    
+
     setBoard(currentBoard);
-    
+
     // Check for game over condition
     const isFull = !currentBoard.flat().includes(0);
-    if(isFull) {
-        let hasMove = false;
-        for(let i = 0; i < GRID_SIZE; i++) {
-            for(let j = 0; j < GRID_SIZE; j++) {
-                const val = currentBoard[i][j];
-                if((j < GRID_SIZE - 1 && currentBoard[i][j+1] === val) || (i < GRID_SIZE - 1 && currentBoard[i+1][j] === val)) {
-                    hasMove = true;
-                    break;
-                }
-            }
-             if(hasMove) break;
+    if (isFull) {
+      let hasMove = false;
+      for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+          const val = currentBoard[i][j];
+          if ((j < GRID_SIZE - 1 && currentBoard[i][j + 1] === val) || (i < GRID_SIZE - 1 && currentBoard[i + 1][j] === val)) {
+            hasMove = true;
+            break;
+          }
         }
-        if(!hasMove) setGameOver(true);
+        if (hasMove) break;
+      }
+      if (!hasMove) setGameOver(true);
     }
 
   }, [board, gameOver, addRandomTile]);
@@ -174,7 +177,7 @@ const Game2048Page = () => {
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
   };
-  
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStart) return;
     const touchEnd = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
@@ -219,10 +222,10 @@ const Game2048Page = () => {
         >
           {gameOver && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/50 rounded-lg">
-                <p className="text-5xl font-extrabold text-white">Game Over!</p>
-                <button onClick={resetGame} className="mt-4 px-6 py-3 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors text-lg">
-                    Try Again
-                </button>
+              <p className="text-5xl font-extrabold text-white">Game Over!</p>
+              <button onClick={resetGame} className="mt-4 px-6 py-3 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors text-lg">
+                Try Again
+              </button>
             </div>
           )}
           <div className="grid grid-cols-4 gap-2 sm:gap-3">
@@ -243,7 +246,7 @@ const Game2048Page = () => {
           </div>
         </div>
         <p className="mt-4 text-gray-500 dark:text-gray-400 text-center">
-            Use your arrow keys or swipe to move the tiles.
+          Use your arrow keys or swipe to move the tiles.
         </p>
       </div>
     </main>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 const BoxShadowGeneratorPage = () => {
     const [hOffset, setHOffset] = useState(10);
@@ -36,7 +37,7 @@ const BoxShadowGeneratorPage = () => {
                             <label className="font-medium">Color</label>
                             <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-16 h-8 p-1 border border-gray-300 dark:border-gray-600 rounded" />
                         </div>
-                         <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2">
                             <input id="inset" type="checkbox" checked={inset} onChange={(e) => setInset(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
                             <label htmlFor="inset" className="font-medium">Inset</label>
                         </div>
@@ -52,7 +53,7 @@ const BoxShadowGeneratorPage = () => {
                         <p className="font-mono bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-sm sm:text-base break-all">
                             box-shadow: {boxShadowValue};
                         </p>
-                        <button onClick={() => navigator.clipboard.writeText(`box-shadow: ${boxShadowValue};`)} className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
+                        <button onClick={() => { navigator.clipboard.writeText(`box-shadow: ${boxShadowValue};`); triggerHapticFeedback(); }} className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
                             Copy to Clipboard
                         </button>
                     </div>

@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import cronParser from 'cron-parser';
-import { format } from 'date-fns'; // Used for formatting preview dates
+import { format } from 'date-fns';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
-// Reusable CopyButton component (included for completeness as per previous context)
+// Reusable CopyButton component with haptic feedback
 function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel: string }) {
     const [copied, setCopied] = useState(false);
 
@@ -13,6 +14,7 @@ function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel
             try {
                 await navigator.clipboard.writeText(valueToCopy);
                 setCopied(true);
+                triggerHapticFeedback(); // Haptic feedback on successful copy
                 setTimeout(() => setCopied(false), 2000);
             } catch (err) {
                 console.error('Failed to copy text: ', err);
@@ -176,6 +178,7 @@ export default function CronGeneratorPage() {
     }, [generatedCronExpression]);
 
     const handleReset = useCallback(() => {
+        triggerHapticFeedback();
         setPreset('daily');
         setCustomMinute('0');
         setCustomHour('0');
@@ -211,7 +214,8 @@ export default function CronGeneratorPage() {
                     <select
                         id="cron-preset"
                         value={preset}
-                        onChange={(e) => setPreset(e.target.value as PresetType)}
+                        onFocus={triggerHapticFeedback}
+                        onChange={(e) => { setPreset(e.target.value as PresetType); triggerHapticFeedback(); }}
                         className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="minutely">Every Minute / Every X Minutes</option>
@@ -235,7 +239,8 @@ export default function CronGeneratorPage() {
                                 type="number"
                                 id="minutely-interval"
                                 value={minutelyInterval}
-                                onChange={(e) => setMinutelyInterval(e.target.value)}
+                                onFocus={triggerHapticFeedback}
+                                onChange={(e) => { setMinutelyInterval(e.target.value); triggerHapticFeedback(); }}
                                 min="1"
                                 max="59"
                                 className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -252,7 +257,8 @@ export default function CronGeneratorPage() {
                                 type="number"
                                 id="hourly-at-minute"
                                 value={hourlyAtMinute}
-                                onChange={(e) => setHourlyAtMinute(e.target.value)}
+                                onFocus={triggerHapticFeedback}
+                                onChange={(e) => { setHourlyAtMinute(e.target.value); triggerHapticFeedback(); }}
                                 min="0"
                                 max="59"
                                 className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -270,7 +276,8 @@ export default function CronGeneratorPage() {
                                     <select
                                         id="weekly-at-day"
                                         value={weeklyAtDay}
-                                        onChange={(e) => setWeeklyAtDay(e.target.value)}
+                                        onFocus={triggerHapticFeedback}
+                                        onChange={(e) => { setWeeklyAtDay(e.target.value); triggerHapticFeedback(); }}
                                         className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
@@ -291,7 +298,8 @@ export default function CronGeneratorPage() {
                                         type="number"
                                         id="monthly-at-day"
                                         value={monthlyAtDay}
-                                        onChange={(e) => setMonthlyAtDay(e.target.value)}
+                                        onFocus={triggerHapticFeedback}
+                                        onChange={(e) => { setMonthlyAtDay(e.target.value); triggerHapticFeedback(); }}
                                         min="1"
                                         max="31"
                                         className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -308,7 +316,8 @@ export default function CronGeneratorPage() {
                                         <select
                                             id="yearly-at-month"
                                             value={yearlyAtMonth}
-                                            onChange={(e) => setYearlyAtMonth(e.target.value)}
+                                            onFocus={triggerHapticFeedback}
+                                            onChange={(e) => { setYearlyAtMonth(e.target.value); triggerHapticFeedback(); }}
                                             className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         >
                                             {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -326,7 +335,8 @@ export default function CronGeneratorPage() {
                                             type="number"
                                             id="yearly-at-day"
                                             value={yearlyAtDay}
-                                            onChange={(e) => setYearlyAtDay(e.target.value)}
+                                            onFocus={triggerHapticFeedback}
+                                            onChange={(e) => { setYearlyAtDay(e.target.value); triggerHapticFeedback(); }}
                                             min="1"
                                             max="31"
                                             className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -344,16 +354,18 @@ export default function CronGeneratorPage() {
                                     id="time-hour"
                                     value={
                                         preset === 'daily' ? dailyAtHour :
-                                        preset === 'weekly' ? weeklyAtHour :
-                                        preset === 'monthly' ? monthlyAtHour :
-                                        yearlyAtHour
+                                            preset === 'weekly' ? weeklyAtHour :
+                                                preset === 'monthly' ? monthlyAtHour :
+                                                    yearlyAtHour
                                     }
+                                    onFocus={triggerHapticFeedback}
                                     onChange={(e) => {
                                         const value = e.target.value;
                                         if (preset === 'daily') setDailyAtHour(value);
                                         else if (preset === 'weekly') setWeeklyAtHour(value);
                                         else if (preset === 'monthly') setMonthlyAtHour(value);
                                         else setYearlyAtHour(value);
+                                        triggerHapticFeedback();
                                     }}
                                     min="0"
                                     max="23"
@@ -369,16 +381,18 @@ export default function CronGeneratorPage() {
                                     id="time-minute"
                                     value={
                                         preset === 'daily' ? dailyAtMinute :
-                                        preset === 'weekly' ? weeklyAtMinute :
-                                        preset === 'monthly' ? monthlyAtMinute :
-                                        yearlyAtMinute
+                                            preset === 'weekly' ? weeklyAtMinute :
+                                                preset === 'monthly' ? monthlyAtMinute :
+                                                    yearlyAtMinute
                                     }
+                                    onFocus={triggerHapticFeedback}
                                     onChange={(e) => {
                                         const value = e.target.value;
                                         if (preset === 'daily') setDailyAtMinute(value);
                                         else if (preset === 'weekly') setWeeklyAtMinute(value);
                                         else if (preset === 'monthly') setMonthlyAtMinute(value);
                                         else setYearlyAtMinute(value);
+                                        triggerHapticFeedback();
                                     }}
                                     min="0"
                                     max="59"
@@ -399,7 +413,8 @@ export default function CronGeneratorPage() {
                                     type="text"
                                     id="custom-minute"
                                     value={customMinute}
-                                    onChange={(e) => setCustomMinute(e.target.value)}
+                                    onFocus={triggerHapticFeedback}
+                                    onChange={(e) => { setCustomMinute(e.target.value); triggerHapticFeedback(); }}
                                     placeholder="e.g., 0, */5, 10-20"
                                     className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -412,7 +427,8 @@ export default function CronGeneratorPage() {
                                     type="text"
                                     id="custom-hour"
                                     value={customHour}
-                                    onChange={(e) => setCustomHour(e.target.value)}
+                                    onFocus={triggerHapticFeedback}
+                                    onChange={(e) => { setCustomHour(e.target.value); triggerHapticFeedback(); }}
                                     placeholder="e.g., 0, 12, 9-17"
                                     className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -425,7 +441,8 @@ export default function CronGeneratorPage() {
                                     type="text"
                                     id="custom-day-of-month"
                                     value={customDayOfMonth}
-                                    onChange={(e) => setCustomDayOfMonth(e.target.value)}
+                                    onFocus={triggerHapticFeedback}
+                                    onChange={(e) => { setCustomDayOfMonth(e.target.value); triggerHapticFeedback(); }}
                                     placeholder="e.g., *, 15, L"
                                     className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -438,7 +455,8 @@ export default function CronGeneratorPage() {
                                     type="text"
                                     id="custom-month"
                                     value={customMonth}
-                                    onChange={(e) => setCustomMonth(e.target.value)}
+                                    onFocus={triggerHapticFeedback}
+                                    onChange={(e) => { setCustomMonth(e.target.value); triggerHapticFeedback(); }}
                                     placeholder="e.g., *, 6, JUL"
                                     className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -451,7 +469,8 @@ export default function CronGeneratorPage() {
                                     type="text"
                                     id="custom-day-of-week"
                                     value={customDayOfWeek}
-                                    onChange={(e) => setCustomDayOfWeek(e.target.value)}
+                                    onFocus={triggerHapticFeedback}
+                                    onChange={(e) => { setCustomDayOfWeek(e.target.value); triggerHapticFeedback(); }}
                                     placeholder="e.g., *, 0, MON, 1-5"
                                     className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />

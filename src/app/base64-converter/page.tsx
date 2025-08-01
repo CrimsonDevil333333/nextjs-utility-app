@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
 
 type Mode = 'encode' | 'decode';
 
@@ -30,6 +31,7 @@ export default function Base64ConverterPage() {
       try {
         await navigator.clipboard.writeText(output);
         setCopySuccess(true);
+        triggerHapticFeedback();
         setTimeout(() => setCopySuccess(false), 2000); // Clear message after 2 seconds
       } catch (err) {
         console.error('Failed to copy text: ', err);
@@ -44,7 +46,7 @@ export default function Base64ConverterPage() {
       <div className="flex justify-center mb-6">
         <div className="p-1 bg-gray-200 dark:bg-gray-700 rounded-lg flex space-x-1 shadow-inner"> {/* Added shadow-inner for depth */}
           <button
-            onClick={() => setMode('encode')}
+            onClick={() => { setMode('encode'); triggerHapticFeedback(); }}
             className={`
               px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
               ${mode === 'encode'
@@ -56,7 +58,7 @@ export default function Base64ConverterPage() {
             Encode
           </button>
           <button
-            onClick={() => setMode('decode')}
+            onClick={() => { setMode('decode'); triggerHapticFeedback(); }}
             className={`
               px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
               ${mode === 'decode'
