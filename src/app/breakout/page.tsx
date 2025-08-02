@@ -42,7 +42,7 @@ const BreakoutPage = () => {
       y: canvas.height - PADDLE_HEIGHT - BALL_RADIUS - 5,
       // Slow down the initial ball speed to make the game less difficult at the start
       dx: 2 * (Math.random() > 0.5 ? 1 : -1),
-      dy: -3
+      dy: -1
     });
   }, []);
 

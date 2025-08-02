@@ -1,5 +1,7 @@
+
 import type { Metadata } from 'next';
 import { HapticLinks } from './components/HapticLinks';
+import { Code, Zap, Palette } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'About - Dev Toolkit',
@@ -14,20 +16,41 @@ export default function AboutPage() {
           About The Dev Toolkit
         </h1>
 
-        {/* Section: What is this project? */}
         <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Our Mission
           </h2>
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            The Dev Toolkit is a passion project aimed at providing a comprehensive, easy-to-use, and highly accessible collection of over <strong>45+ online utilities</strong>. Our goal is to streamline workflows and make complex operations simple for everyone.
+            The Dev Toolkit is a passion project aimed at providing a comprehensive, easy-to-use, and highly accessible collection of over <strong>60+ online utilities</strong>. Our goal is to streamline workflows and make complex operations simple for everyone.
           </p>
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
             Whether you're a developer needing to format JSON, a designer creating a favicon, or just looking to play a quick game of Minesweeper, this toolkit is built for you. We are constantly working to expand our offerings and ensure a smooth, intuitive user experience.
           </p>
         </section>
 
-        {/* Section: Technologies Used */}
+        <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Key Features
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <Code className="mx-auto w-12 h-12 text-blue-500 mb-2" />
+              <h3 className="font-bold">For Developers</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Tools for formatting, converting, and generating code and data.</p>
+            </div>
+            <div className="text-center">
+              <Palette className="mx-auto w-12 h-12 text-pink-500 mb-2" />
+              <h3 className="font-bold">For Designers</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Utilities for color, typography, and image manipulation.</p>
+            </div>
+            <div className="text-center">
+              <Zap className="mx-auto w-12 h-12 text-yellow-500 mb-2" />
+              <h3 className="font-bold">For Everyone</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">A collection of fun and useful tools for everyday tasks.</p>
+            </div>
+          </div>
+        </section>
+
         <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Built With
@@ -46,7 +69,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Section: About Me / The Creator */}
         <section className="mb-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             About the Creator
@@ -57,10 +79,9 @@ export default function AboutPage() {
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
             I'm passionate about creating efficient and user-friendly applications. You can connect with me and see more of my work on my professional profiles:
           </p>
-          <HapticLinks type="social" /> {/* Use the new component for social links */}
+          <HapticLinks type="social" />
         </section>
 
-        {/* Section: Feedback & Contact */}
         <section className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Feedback & Support
@@ -69,7 +90,7 @@ export default function AboutPage() {
             Your feedback is invaluable! If you have suggestions for new tools, ideas for improvements, or encounter any issues, please don't hesitate to reach out.
           </p>
           <div className="text-center">
-            <HapticLinks type="feedback" /> {/* Use the new component for the feedback link */}
+            <HapticLinks type="feedback" />
           </div>
         </section>
       </div>

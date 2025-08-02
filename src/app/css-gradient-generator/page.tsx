@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { triggerHapticFeedback } from '@/utils/haptics';
+import { Copy, Check, RefreshCw, Shuffle } from 'lucide-react';
 
-// Reusable CopyButton component with haptic feedback
+// --- Reusable Components ---
+
 function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel: string }) {
     const [copied, setCopied] = useState(false);
 
@@ -12,7 +14,7 @@ function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel
             try {
                 await navigator.clipboard.writeText(valueToCopy);
                 setCopied(true);
-                triggerHapticFeedback(); // Haptic feedback on successful copy
+                triggerHapticFeedback();
                 setTimeout(() => setCopied(false), 2000);
             } catch (err) {
                 console.error('Failed to copy text: ', err);
@@ -26,86 +28,122 @@ function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel
         <button
             onClick={handleCopy}
             disabled={isValueEmpty}
-            className={`
-                px-4 py-2 text-sm font-medium rounded-md
-                flex items-center space-x-2
-                transition-all duration-200 ease-in-out
-                ${isValueEmpty
-                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
-                }
-            `}
+            className={`p-2 rounded-md transition-all duration-200 ease-in-out ${isValueEmpty ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
             aria-label={ariaLabel}
             title={ariaLabel}
         >
-            {copied ? (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Copied!</span>
-                </>
-            ) : (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    <span>Copy</span>
-                </>
-            )}
+            {copied ? <Check size={16} /> : <Copy size={16} />}
         </button>
     );
 }
 
 const CSSGradientGeneratorPage = () => {
+    const [gradientType, setGradientType] = useState<'linear' | 'radial'>('linear');
     const [color1, setColor1] = useState('#ff0000');
     const [color2, setColor2] = useState('#0000ff');
+    const [color3, setColor3] = useState('#00ff00');
+    const [useColor3, setUseColor3] = useState(false);
+    const [colorStop1, setColorStop1] = useState(0);
+    const [colorStop2, setColorStop2] = useState(100);
     const [angle, setAngle] = useState(90);
 
-    const gradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+    const gradient = useMemo(() => {
+        const colors = [
+            `${color1} ${colorStop1}%`,
+            `${color2} ${colorStop2}%`,
+            ...(useColor3 ? [`${color3}`] : [])
+        ].join(', ');
+
+        return gradientType === 'linear'
+            ? `linear-gradient(${angle}deg, ${colors})`
+            : `radial-gradient(circle, ${colors})`;
+    }, [gradientType, color1, color2, color3, useColor3, colorStop1, colorStop2, angle]);
+
+    const generateRandomGradient = () => {
+        triggerHapticFeedback();
+        const randomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+        setColor1(randomColor());
+        setColor2(randomColor());
+        setColor3(randomColor());
+        setAngle(Math.floor(Math.random() * 361));
+    };
+
+    const resetGradient = () => {
+        triggerHapticFeedback();
+        setColor1('#ff0000');
+        setColor2('#0000ff');
+        setColor3('#00ff00');
+        setAngle(90);
+        setUseColor3(false);
+        setColorStop1(0);
+        setColorStop2(100);
+    };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 sm:p-8">
-            <div className="text-center mb-8">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">CSS Gradient Generator</h1>
-                <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Create and preview linear gradients in real-time.</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-                {/* Controls Panel */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 space-y-6">
-                    <h2 className="text-2xl font-bold mb-4">Controls</h2>
-
-                    {/* Color Pickers */}
-                    <div className="flex items-center justify-around">
-                        <div className="text-center">
-                            <label htmlFor="color1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color 1</label>
-                            <input id="color1" type="color" value={color1} onFocus={triggerHapticFeedback} onChange={(e) => { setColor1(e.target.value); triggerHapticFeedback(); }} className="w-20 h-20 p-1 border-none rounded-full cursor-pointer" />
-                        </div>
-                        <div className="text-center">
-                            <label htmlFor="color2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color 2</label>
-                            <input id="color2" type="color" value={color2} onFocus={triggerHapticFeedback} onChange={(e) => { setColor2(e.target.value); triggerHapticFeedback(); }} className="w-20 h-20 p-1 border-none rounded-full cursor-pointer" />
-                        </div>
-                    </div>
-
-                    {/* Angle Slider */}
-                    <div>
-                        <label htmlFor="angle" className="block font-medium text-gray-700 dark:text-gray-300 mb-2">Angle: {angle}°</label>
-                        <input id="angle" type="range" min="0" max="360" value={angle} onFocus={triggerHapticFeedback} onChange={(e) => { setAngle(Number(e.target.value)); triggerHapticFeedback(); }} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" />
-                    </div>
-
-                    {/* CSS Output */}
-                    <div>
-                        <label htmlFor="css-output" className="block font-medium text-gray-700 dark:text-gray-300 mb-2">CSS Code</label>
-                        <div className="flex items-center gap-2">
-                            <input id="css-output" type="text" value={gradient} readOnly className="w-full p-2.5 border rounded-md font-mono bg-gray-100 dark:bg-gray-900 dark:border-gray-600" />
-                            <CopyButton valueToCopy={gradient} ariaLabel="Copy CSS gradient code" />
-                        </div>
-                    </div>
+        <div className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+            <div className="w-full max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">CSS Gradient Generator</h1>
+                    <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Create and preview gradients in real-time.</p>
                 </div>
 
-                {/* Preview Panel */}
-                <div className="h-80 w-full rounded-lg shadow-lg border border-gray-200 dark:border-gray-700" style={{ background: gradient }}></div>
+                <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
+                    <div className="grid md:grid-cols-2 gap-8 items-center">
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold mb-4">Controls</h2>
+                            <div className="flex gap-2 bg-gray-200 dark:bg-gray-700 p-1 rounded-full">
+                                <button onClick={() => { setGradientType('linear'); triggerHapticFeedback(); }} className={`w-full py-2 rounded-full font-semibold ${gradientType === 'linear' ? 'bg-white dark:bg-gray-900 shadow' : ''}`}>Linear</button>
+                                <button onClick={() => { setGradientType('radial'); triggerHapticFeedback(); }} className={`w-full py-2 rounded-full font-semibold ${gradientType === 'radial' ? 'bg-white dark:bg-gray-900 shadow' : ''}`}>Radial</button>
+                            </div>
+                            <div className="flex items-center justify-around">
+                                <div className="text-center">
+                                    <label htmlFor="color1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color 1</label>
+                                    <input id="color1" type="color" value={color1} onFocus={triggerHapticFeedback} onChange={(e) => { setColor1(e.target.value); triggerHapticFeedback(); }} className="w-20 h-20 p-1 border-none rounded-full cursor-pointer" />
+                                </div>
+                                <div className="text-center">
+                                    <label htmlFor="color2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color 2</label>
+                                    <input id="color2" type="color" value={color2} onFocus={triggerHapticFeedback} onChange={(e) => { setColor2(e.target.value); triggerHapticFeedback(); }} className="w-20 h-20 p-1 border-none rounded-full cursor-pointer" />
+                                </div>
+                                {useColor3 && (
+                                    <div className="text-center">
+                                        <label htmlFor="color3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color 3</label>
+                                        <input id="color3" type="color" value={color3} onFocus={triggerHapticFeedback} onChange={(e) => { setColor3(e.target.value); triggerHapticFeedback(); }} className="w-20 h-20 p-1 border-none rounded-full cursor-pointer" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <input id="useColor3" type="checkbox" checked={useColor3} onChange={(e) => { setUseColor3(e.target.checked); triggerHapticFeedback(); }} className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                                <label htmlFor="useColor3" className="font-medium">Add a third color</label>
+                            </div>
+                            <div>
+                                <label htmlFor="angle" className="block font-medium text-gray-700 dark:text-gray-300 mb-2">Angle: {angle}°</label>
+                                <input id="angle" type="range" min="0" max="360" value={angle} onFocus={triggerHapticFeedback} onChange={(e) => { setAngle(Number(e.target.value)); triggerHapticFeedback(); }} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="colorStop1" className="block font-medium text-gray-700 dark:text-gray-300 mb-2">Color 1 Stop: {colorStop1}%</label>
+                                    <input id="colorStop1" type="range" min="0" max="100" value={colorStop1} onFocus={triggerHapticFeedback} onChange={(e) => { setColorStop1(Number(e.target.value)); triggerHapticFeedback(); }} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" />
+                                </div>
+                                <div>
+                                    <label htmlFor="colorStop2" className="block font-medium text-gray-700 dark:text-gray-300 mb-2">Color 2 Stop: {colorStop2}%</label>
+                                    <input id="colorStop2" type="range" min="0" max="100" value={colorStop2} onFocus={triggerHapticFeedback} onChange={(e) => { setColorStop2(Number(e.target.value)); triggerHapticFeedback(); }} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" />
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="css-output" className="block font-medium text-gray-700 dark:text-gray-300 mb-2">CSS Code</label>
+                                <div className="flex items-center gap-2">
+                                    <input id="css-output" type="text" value={`background: ${gradient};`} readOnly className="w-full p-3 border rounded-md font-mono bg-gray-100 dark:bg-gray-900/50 dark:border-gray-600" />
+                                    <CopyButton valueToCopy={`background: ${gradient};`} ariaLabel="Copy CSS gradient code" />
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <button onClick={generateRandomGradient} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"><Shuffle size={16} /> Random</button>
+                                <button onClick={resetGradient} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500"><RefreshCw size={16} /> Reset</button>
+                            </div>
+                        </div>
+                        <div className="h-80 w-full rounded-lg shadow-lg border border-gray-200 dark:border-gray-700" style={{ background: gradient }}></div>
+                    </div>
+                </div>
             </div>
         </div>
     );

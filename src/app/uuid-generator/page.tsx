@@ -1,99 +1,105 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { triggerHapticFeedback } from '@/utils/haptics';
+import { Copy, Check, RefreshCw } from 'lucide-react';
+import { v4 as uuidv4, v1 as uuidv1 } from 'uuid';
 
-// Reusable CopyButton component (assuming this is shared or re-defined here)
+// --- Reusable Components ---
+
 function CopyButton({ valueToCopy, ariaLabel }: { valueToCopy: string; ariaLabel: string }) {
-    const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const handleCopy = useCallback(async () => {
-        if (valueToCopy) {
-            try {
-                await navigator.clipboard.writeText(valueToCopy);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-            }
-        }
-    }, [valueToCopy]);
+  const handleCopy = useCallback(async () => {
+    if (valueToCopy) {
+      try {
+        await navigator.clipboard.writeText(valueToCopy);
+        setCopied(true);
+        triggerHapticFeedback();
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+  }, [valueToCopy]);
 
-    const isValueEmpty = !valueToCopy;
+  const isValueEmpty = !valueToCopy;
 
-    return (
-        <button
-            onClick={handleCopy}
-            disabled={isValueEmpty}
-            className={`
-                px-4 py-2 text-sm font-medium rounded-md
-                flex items-center space-x-2 /* Increased space between icon and text */
-                transition-all duration-200 ease-in-out
-                ${isValueEmpty
-                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
-                }
-            `}
-            aria-label={ariaLabel}
-            title={ariaLabel}
-        >
-            {copied ? (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Copied!</span>
-                </>
-            ) : (
-                <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    <span>Copy</span>
-                </>
-            )}
-        </button>
-    );
+  return (
+    <button
+      onClick={handleCopy}
+      disabled={isValueEmpty}
+      className={`p-2 rounded-md transition-all duration-200 ease-in-out ${isValueEmpty ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+      aria-label={ariaLabel}
+      title={ariaLabel}
+    >
+      {copied ? <Check size={16} /> : <Copy size={16} />}
+    </button>
+  );
 }
 
 export default function UuidGeneratorPage() {
-  const [uuid, setUuid] = useState('');
+  const [uuids, setUuids] = useState<string[]>([]);
+  const [count, setCount] = useState(1);
+  const [version, setVersion] = useState<'v4' | 'v1'>('v4');
 
-  const generateUuid = useCallback(() => {
-    setUuid(crypto.randomUUID());
-  }, []);
+  const generateUuids = useCallback(() => {
+    triggerHapticFeedback();
+    const newUuids = Array.from({ length: count }, () => version === 'v4' ? uuidv4() : uuidv1());
+    setUuids(newUuids);
+  }, [count, version]);
 
   useEffect(() => {
-    generateUuid(); // Generate one on initial load
-  }, [generateUuid]); // Depend on generateUuid to prevent re-creation
+    generateUuids();
+  }, [generateUuids]);
 
   return (
-    <div className="max-w-xl mx-auto p-4 sm:p-8 text-center">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">UUID Generator</h1>
-      <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-        <p 
-          className="font-mono text-xl md:text-2xl break-all p-4 mb-6 border rounded-md /* Increased font size and padding */
-                     bg-gray-100 dark:bg-gray-900 dark:border-gray-700 /* Consistent read-only styling */
-                     text-gray-800 dark:text-gray-200 cursor-text select-all /* Allow text selection */"
-        >
-          {uuid}
-        </p>
-        <div className="flex justify-center gap-4">
-          <button 
-            onClick={generateUuid} 
-            className="px-5 py-2 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center space-x-2"
-            title="Generate a new UUID"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004 14c0 1.57.81 3.013 2.112 4M6.88 20.32c1.378.536 2.9.82 4.54.82 5.093 0 9.2-4.107 9.2-9.2 0-.256-.007-.512-.02-.767m-6.855-4.502h5m-5 0V7m0 0H7m8 0a2 2 0 100 4m0-4zm0 4a2 2 0 100 4m0-4z" />
-            </svg>
-            <span>Generate New</span>
-          </button>
-          
-          <CopyButton valueToCopy={uuid} ariaLabel="Copy UUID to clipboard" />
+    <div className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="w-full max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">UUID Generator</h1>
+          <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Generate universally unique identifiers.</p>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-            Generates RFC 4122 version 4 (random) UUIDs.
-        </p>
+
+        <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label htmlFor="uuid-version" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">UUID Version</label>
+              <select id="uuid-version" value={version} onFocus={triggerHapticFeedback} onChange={(e) => { setVersion(e.target.value as 'v4' | 'v1'); triggerHapticFeedback(); }} className="w-full p-3 border rounded-md dark:bg-gray-900 dark:border-gray-600">
+                <option value="v4">Version 4 (Random)</option>
+                <option value="v1">Version 1 (Timestamp)</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="uuid-count" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Count</label>
+              <input id="uuid-count" type="number" value={count} onFocus={triggerHapticFeedback} onChange={(e) => { setCount(parseInt(e.target.value)); triggerHapticFeedback(); }} min="1" max="100" className="w-full p-3 border rounded-md dark:bg-gray-900 dark:border-gray-600" />
+            </div>
+          </div>
+
+          <div className="space-y-2 mb-6">
+            {uuids.map((uuid, index) => (
+              <div key={index} className="relative">
+                <input
+                  type="text"
+                  readOnly
+                  value={uuid}
+                  className="w-full p-3 font-mono text-base border rounded-lg bg-gray-100 dark:bg-gray-900/50 dark:border-gray-700 pr-12"
+                />
+                <div className="absolute top-1/2 -translate-y-1/2 right-3">
+                  <CopyButton valueToCopy={uuid} ariaLabel={`Copy UUID ${index + 1}`} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <button onClick={generateUuids} className="px-5 py-3 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors shadow flex items-center space-x-2">
+              <RefreshCw size={18} />
+              <span>Generate</span>
+            </button>
+            <CopyButton valueToCopy={uuids.join('\n')} ariaLabel="Copy all UUIDs" />
+          </div>
+        </div>
       </div>
     </div>
   );
