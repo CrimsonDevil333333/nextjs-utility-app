@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://utility.crimsondevil.qzz.io/
+
+# Sitemaps
+Sitemap: https://utility.crimsondevil.qzz.io/sitemap.xml
