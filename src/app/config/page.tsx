@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX, Trash2, RefreshCw, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX, Trash2, RefreshCw, Clock } from 'lucide-react';
 import { triggerHapticFeedback } from '@/utils/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -37,6 +37,7 @@ const ConfigPage = () => {
   const [hapticEnabled, setHapticEnabled] = useState(false);
   const [hapticIntensity, setHapticIntensity] = useState(0.5);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [clearRecentMessage, setClearRecentMessage] = useState('');
 
   // New state for enhanced features
   const [autoClearInput, setAutoClearInput] = useState(true);
@@ -79,20 +80,17 @@ const ConfigPage = () => {
 
   const handleResetAll = () => {
     triggerHapticFeedback();
-    localStorage.removeItem('userApiKeys');
-    localStorage.removeItem('hapticFeedback');
-    localStorage.removeItem('hapticIntensity');
-    localStorage.removeItem('autoClearInput');
-    localStorage.removeItem('animationsEnabled');
-    localStorage.removeItem('showToolCounts');
+    localStorage.clear(); // Clears all items in localStorage
     window.location.reload();
   };
 
-  const handleClearCache = () => {
+  const handleClearRecent = () => {
     triggerHapticFeedback();
-    // This is a placeholder for a more specific cache clearing logic
-    // For now, it just reloads the page
-    window.location.reload();
+    localStorage.removeItem('recentlyUsedTools');
+    setClearRecentMessage('Cleared!');
+    setTimeout(() => {
+      setClearRecentMessage('');
+    }, 2000);
   }
 
   const handleApiKeyChange = (agent: Agent, value: string) => {
@@ -164,10 +162,24 @@ const ConfigPage = () => {
                   <ToggleSwitch enabled={autoClearInput} onChange={setAutoClearInput} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <label htmlFor="clearCache" className="text-sm font-medium text-gray-700 dark:text-gray-300">Clear tool cache</label>
-                  <button onClick={handleClearCache} className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors">
-                    <RefreshCw size={16} /> Clear
-                  </button>
+                  <label htmlFor="clearRecent" className="text-sm font-medium text-gray-700 dark:text-gray-300">Clear recently used tools</label>
+                  <div className="relative flex items-center gap-2">
+                    <AnimatePresence>
+                      {clearRecentMessage && (
+                        <motion.div
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10 }}
+                          className="text-sm font-medium text-green-600 dark:text-green-400"
+                        >
+                          {clearRecentMessage}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <button onClick={handleClearRecent} className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors">
+                      <Clock size={16} /> Clear
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

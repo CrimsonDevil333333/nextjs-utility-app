@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Info, ChevronDown, ChevronUp, ArrowUp, Settings, X, Search, LayoutGrid, List } from 'lucide-react';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Info, ChevronDown, ChevronUp, ArrowUp, Settings, X, Search, LayoutGrid, List, Shuffle, Clock } from 'lucide-react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { utilities, Utility } from '@/app/data/utilities';
 import { triggerHapticFeedback } from '@/utils/haptics';
@@ -24,21 +24,36 @@ function useDebounce<T>(value: T, delay: number): T {
 
 // --- Sub-components for better structure ---
 
-const UtilityCard = ({ util }: { util: Utility }) => (
-  <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in" onClick={triggerHapticFeedback}>
-    <div className="p-6 bg-white/80 dark:bg-gray-800/50 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200/80 dark:border-gray-700/50 h-full flex flex-col justify-between">
-      <div>
-        <span className="text-4xl mb-4 block transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{util.name}</h2>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">{util.description}</p>
+const UtilityCard = ({ util }: { util: Utility }) => {
+  const handleCardClick = useCallback(() => {
+    triggerHapticFeedback();
+    try {
+      const stored = localStorage.getItem('recentlyUsedTools');
+      let recent: Utility[] = stored ? JSON.parse(stored) : [];
+      recent = recent.filter(u => u.href !== util.href);
+      recent.unshift(util);
+      localStorage.setItem('recentlyUsedTools', JSON.stringify(recent.slice(0, 4)));
+    } catch (e) {
+      console.error("Failed to update recently used tools:", e);
+    }
+  }, [util]);
+
+  return (
+    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in" onClick={handleCardClick}>
+      <div className="p-6 bg-white/80 dark:bg-gray-800/50 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200/80 dark:border-gray-700/50 h-full flex flex-col justify-between">
+        <div>
+          <span className="text-4xl mb-4 block transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{util.name}</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">{util.description}</p>
+        </div>
+        <div className="mt-4 text-blue-600 dark:text-blue-400 flex items-center group-hover:gap-2 transition-all duration-200 text-sm font-medium">
+          Go to tool
+          <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+        </div>
       </div>
-      <div className="mt-4 text-blue-600 dark:text-blue-400 flex items-center group-hover:gap-2 transition-all duration-200 text-sm font-medium">
-        Go to tool
-        <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-      </div>
-    </div>
-  </Link>
-);
+    </Link>
+  );
+};
 
 const LayoutSwitcher = ({ currentLayout, onLayoutChange }: { currentLayout: 'minimal' | 'classic', onLayoutChange: (layout: 'minimal' | 'classic') => void }) => (
   <div className="flex items-center gap-1 p-1 rounded-full bg-gray-200 dark:bg-gray-900">
@@ -49,6 +64,25 @@ const LayoutSwitcher = ({ currentLayout, onLayoutChange }: { currentLayout: 'min
       <List size={16} /> Classic
     </button>
   </div>
+);
+
+const WelcomeBanner = ({ onDismiss, isMobile }: { onDismiss: () => void; isMobile: boolean }) => (
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    className="relative bg-blue-500 text-white p-4 rounded-lg mb-8 shadow-lg"
+  >
+    <p className="pr-8">
+      {isMobile
+        ? 'Welcome! Try the "Classic Layout" for a full overview of all tools.'
+        : <>Welcome! Try the new <strong className="font-semibold">Classic Layout</strong> for a full overview, or use the <strong className="font-semibold">/</strong> key to start a search.</>
+      }
+    </p>
+    <button onClick={onDismiss} className="absolute top-2 right-2 p-2 rounded-full hover:bg-white/20 transition-colors">
+      <X size={18} />
+    </button>
+  </motion.div>
 );
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -80,6 +114,7 @@ export default function HomePageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get('category'));
@@ -90,8 +125,12 @@ export default function HomePageContent() {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [showToolCounts, setShowToolCounts] = useState(false);
+  const [recentlyUsed, setRecentlyUsed] = useState<Utility[]>([]);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Memoize utility data processing
+  const featuredTools = useMemo(() => utilities.filter(u => ['/converters/json-formatter', '/design/color-picker'].includes(u.href)), []);
+
   const { groupedUtilities, sortedCategories, dynamicFilterCategories } = useMemo(() => {
     const grouped = utilities.reduce((acc, util) => {
       (acc[util.category] = acc[util.category] || []).push(util);
@@ -114,41 +153,42 @@ export default function HomePageContent() {
     };
   }, []);
 
-  // Effect to update URL from state
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (debouncedSearchTerm) {
-      params.set('search', debouncedSearchTerm);
-    } else {
-      params.delete('search');
-    }
-    if (selectedCategory) {
-      params.set('category', selectedCategory);
-    } else {
-      params.delete('category');
-    }
+    if (debouncedSearchTerm) params.set('search', debouncedSearchTerm);
+    else params.delete('search');
+    if (selectedCategory) params.set('category', selectedCategory);
+    else params.delete('category');
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [debouncedSearchTerm, selectedCategory, pathname, router]);
 
-  // Effect to manage category expansion and layout style from localStorage
   useEffect(() => {
+    // Check for mobile on mount to avoid hydration mismatch
+    setIsMobile(window.innerWidth < 768);
+
     const savedExpansionState = localStorage.getItem('expandedCategories');
-    if (savedExpansionState) {
-      setExpandedCategories(JSON.parse(savedExpansionState));
-    } else {
-      const initialState = sortedCategories.reduce((acc, category) => ({ ...acc, [category]: true }), {});
-      setExpandedCategories(initialState);
-    }
+    setExpandedCategories(savedExpansionState ? JSON.parse(savedExpansionState) : sortedCategories.reduce((acc, category) => ({ ...acc, [category]: true }), {}));
 
     const savedLayout = localStorage.getItem('homePageLayout') as 'minimal' | 'classic';
-    if (savedLayout) {
-      setLayoutStyle(savedLayout);
-    }
+    if (savedLayout) setLayoutStyle(savedLayout);
 
     const savedShowCounts = localStorage.getItem('showToolCounts');
-    if (savedShowCounts) {
-      setShowToolCounts(JSON.parse(savedShowCounts));
-    }
+    if (savedShowCounts) setShowToolCounts(JSON.parse(savedShowCounts));
+
+    const storedRecent = localStorage.getItem('recentlyUsedTools');
+    if (storedRecent) setRecentlyUsed(JSON.parse(storedRecent));
+
+    const welcomeDismissed = localStorage.getItem('welcomeMessageDismissed');
+    if (!welcomeDismissed) setShowWelcome(true);
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === '/' && document.activeElement?.tagName !== 'INPUT') {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [sortedCategories]);
 
   useEffect(() => {
@@ -157,20 +197,16 @@ export default function HomePageContent() {
     }
   }, [expandedCategories]);
 
-  // Memoized filtering logic
   const filteredUtilities = useMemo(() => {
     const term = debouncedSearchTerm.toLowerCase();
     const category = selectedCategory;
-
     if (!category && !term) return utilities;
-
     return utilities.filter(util =>
       (!category || util.category === category) &&
       (!term || util.name.toLowerCase().includes(term) || util.description.toLowerCase().includes(term) || util.category.toLowerCase().includes(term))
     );
   }, [debouncedSearchTerm, selectedCategory]);
 
-  // Scroll handling
   const handleScroll = useCallback(() => setShowScrollToTop(window.scrollY > 300), []);
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -183,6 +219,17 @@ export default function HomePageContent() {
     triggerHapticFeedback();
   };
 
+  const handleRandomTool = () => {
+    triggerHapticFeedback();
+    const randomTool = utilities[Math.floor(Math.random() * utilities.length)];
+    router.push(randomTool.href);
+  };
+
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    localStorage.setItem('welcomeMessageDismissed', 'true');
+  };
+
   const setAllCategoriesExpanded = (isExpanded: boolean) => {
     const newState = sortedCategories.reduce((acc, key) => ({ ...acc, [key]: isExpanded }), {} as Record<string, boolean>);
     setExpandedCategories(newState);
@@ -193,9 +240,19 @@ export default function HomePageContent() {
   const toggleCategory = (category: string) => { setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] })); triggerHapticFeedback(); };
   const handleFilterClick = (categoryName: string) => { setSelectedCategory(categoryName === 'All' ? null : categoryName); setIsFilterModalOpen(false); triggerHapticFeedback(); };
 
+  const isFiltered = debouncedSearchTerm || selectedCategory;
+
+  const handleOpenFilterModal = () => {
+    setIsFilterModalOpen(true);
+    triggerHapticFeedback();
+  };
+
   return (
     <main className="min-h-screen p-4 sm:p-8 bg-gray-50 dark:bg-gray-950">
       <div className="max-w-6xl mx-auto py-8">
+        <AnimatePresence>
+          {showWelcome && <WelcomeBanner onDismiss={dismissWelcome} isMobile={isMobile} />}
+        </AnimatePresence>
         <header className="relative text-center mb-12 animate-fade-in">
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-2 sm:p-0">
             <Link href="/config" title="Configuration" onClick={triggerHapticFeedback} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm shadow-md transition-colors hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -217,6 +274,7 @@ export default function HomePageContent() {
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search for any tool..."
               className="w-full p-4 pl-14 text-lg border-2 border-transparent rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-lg"
@@ -224,28 +282,76 @@ export default function HomePageContent() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center gap-2">
             <LayoutSwitcher currentLayout={layoutStyle} onLayoutChange={handleLayoutChange} />
+            <button onClick={handleRandomTool} className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-900 shadow transition-transform hover:scale-110" title="Random Tool">
+              <Shuffle size={18} className="text-gray-600 dark:text-gray-400" />
+            </button>
           </div>
         </section>
 
-        {/* Filters and Content Area */}
-        <div className="mt-12">
-          {layoutStyle === 'classic' ? (
+        {/* --- Moved Filter Section for Minimal Layout --- */}
+        {layoutStyle === 'minimal' && (
+          <section className="mb-12">
+            {/* Desktop Filters */}
+            <div className="hidden sm:flex flex-wrap justify-center gap-3 min-h-[44px]">
+              {dynamicFilterCategories.map(cat => (
+                <button
+                  key={cat.name}
+                  onClick={() => handleFilterClick(cat.name)}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${selectedCategory === cat.name || (cat.name === 'All' && !selectedCategory) ? `${CATEGORY_COLORS[cat.name]} shadow-md` : 'bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                >
+                  <span>{cat.emoji}</span>
+                  <span>{cat.name} {showToolCounts && <span className="font-normal opacity-75">{cat.count}</span>}</span>
+                </button>
+              ))}
+            </div>
+            {/* Mobile Filter Button */}
+            <div className="sm:hidden flex justify-center">
+              <button
+                onClick={handleOpenFilterModal}
+                className={`flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-full transition-all duration-300 border shadow-md ${CATEGORY_COLORS[selectedCategory || 'All']} border-transparent`}
+              >
+                <Settings className="h-4 w-4" />
+                <span>Filters {selectedCategory ? `(${selectedCategory})` : ''}</span>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* --- Featured & Recently Used Sections --- */}
+        {!isFiltered && (
+          <section className="mb-12 space-y-8">
+            {featuredTools.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Featured Tools</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {featuredTools.map(util => <UtilityCard key={util.name} util={util} />)}
+                </div>
+              </div>
+            )}
+            {recentlyUsed.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"><Clock size={22} /> Recently Used</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {recentlyUsed.map(util => <UtilityCard key={util.name} util={util} />)}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* --- Main Content Area --- */}
+        <div>
+          {layoutStyle === 'classic' && !isFiltered ? (
             // --- CLASSIC LAYOUT ---
             <div className="space-y-12">
-              {!debouncedSearchTerm && (
-                <div className="flex justify-end gap-2">
-                  <button onClick={() => setAllCategoriesExpanded(true)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Expand All</button>
-                  <button onClick={() => setAllCategoriesExpanded(false)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Collapse All</button>
-                </div>
-              )}
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setAllCategoriesExpanded(true)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Expand All</button>
+                <button onClick={() => setAllCategoriesExpanded(false)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Collapse All</button>
+              </div>
               {sortedCategories.map((category) => {
-                const utilsInCategory = groupedUtilities[category].filter(util =>
-                  !debouncedSearchTerm || util.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || util.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-                );
-                if (utilsInCategory.length === 0) return null;
-
+                const utilsInCategory = groupedUtilities[category];
                 return (
                   <section key={category}>
                     <button onClick={() => toggleCategory(category)} className="w-full flex justify-between items-center text-left text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b-2 border-gray-300 dark:border-gray-700">
@@ -262,33 +368,8 @@ export default function HomePageContent() {
               })}
             </div>
           ) : (
-            // --- MINIMAL LAYOUT ---
+            // --- MINIMAL LAYOUT (OR FILTERED CLASSIC) ---
             <>
-              {/* Desktop Filters */}
-              <div className="hidden sm:flex flex-wrap justify-center gap-3 mb-12 min-h-[44px]">
-                {dynamicFilterCategories.map(cat => (
-                  <button
-                    key={cat.name}
-                    onClick={() => handleFilterClick(cat.name)}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${selectedCategory === cat.name || (cat.name === 'All' && !selectedCategory) ? `${CATEGORY_COLORS[cat.name]} shadow-md` : 'bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                  >
-                    <span>{cat.emoji}</span>
-                    <span>{cat.name} {showToolCounts && <span className="font-normal opacity-75">{cat.count}</span>}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Filter Button */}
-              <div className="sm:hidden flex justify-center mb-8">
-                <button
-                  onClick={() => setIsFilterModalOpen(true)}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-full transition-all duration-300 border shadow-md ${CATEGORY_COLORS[selectedCategory || 'All']} border-transparent`}
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>Filters {selectedCategory ? `(${selectedCategory})` : ''}</span>
-                </button>
-              </div>
-
               {filteredUtilities.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredUtilities.map(util => (<UtilityCard key={util.name} util={util} />))}
@@ -301,7 +382,6 @@ export default function HomePageContent() {
         </div>
       </div>
 
-      {/* Mobile Filter Modal (Only for Minimal Layout) */}
       {layoutStyle === 'minimal' && (
         <AnimatePresence>
           {isFilterModalOpen && (
