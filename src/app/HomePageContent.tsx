@@ -128,6 +128,7 @@ export default function HomePageContent() {
   const [recentlyUsed, setRecentlyUsed] = useState<Utility[]>([]);
   const [showWelcome, setShowWelcome] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileFilterStyle, setMobileFilterStyle] = useState<'sheet' | 'modal'>('sheet');
 
   const featuredTools = useMemo(() => utilities.filter(u => ['/converters/json-formatter', '/design/color-picker'].includes(u.href)), []);
 
@@ -163,7 +164,6 @@ export default function HomePageContent() {
   }, [debouncedSearchTerm, selectedCategory, pathname, router]);
 
   useEffect(() => {
-    // Check for mobile on mount to avoid hydration mismatch
     setIsMobile(window.innerWidth < 768);
 
     const savedExpansionState = localStorage.getItem('expandedCategories');
@@ -180,6 +180,9 @@ export default function HomePageContent() {
 
     const welcomeDismissed = localStorage.getItem('welcomeMessageDismissed');
     if (!welcomeDismissed) setShowWelcome(true);
+
+    const savedFilterStyle = localStorage.getItem('mobileFilterStyle') as 'sheet' | 'modal';
+    if (savedFilterStyle) setMobileFilterStyle(savedFilterStyle);
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === '/' && document.activeElement?.tagName !== 'INPUT') {
@@ -290,10 +293,8 @@ export default function HomePageContent() {
           </div>
         </section>
 
-        {/* --- Moved Filter Section for Minimal Layout --- */}
         {layoutStyle === 'minimal' && (
           <section className="mb-12">
-            {/* Desktop Filters */}
             <div className="hidden sm:flex flex-wrap justify-center gap-3 min-h-[44px]">
               {dynamicFilterCategories.map(cat => (
                 <button
@@ -306,7 +307,6 @@ export default function HomePageContent() {
                 </button>
               ))}
             </div>
-            {/* Mobile Filter Button */}
             <div className="sm:hidden flex justify-center">
               <button
                 onClick={handleOpenFilterModal}
@@ -319,7 +319,6 @@ export default function HomePageContent() {
           </section>
         )}
 
-        {/* --- Featured & Recently Used Sections --- */}
         {!isFiltered && (
           <section className="mb-12 space-y-8">
             {featuredTools.length > 0 && (
@@ -341,10 +340,8 @@ export default function HomePageContent() {
           </section>
         )}
 
-        {/* --- Main Content Area --- */}
         <div>
           {layoutStyle === 'classic' && !isFiltered ? (
-            // --- CLASSIC LAYOUT ---
             <div className="space-y-12">
               <div className="flex justify-end gap-2">
                 <button onClick={() => setAllCategoriesExpanded(true)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Expand All</button>
@@ -368,7 +365,6 @@ export default function HomePageContent() {
               })}
             </div>
           ) : (
-            // --- MINIMAL LAYOUT (OR FILTERED CLASSIC) ---
             <>
               {filteredUtilities.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -385,29 +381,61 @@ export default function HomePageContent() {
       {layoutStyle === 'minimal' && (
         <AnimatePresence>
           {isFilterModalOpen && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={() => setIsFilterModalOpen(false)}>
-              <motion.div
-                initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="absolute bottom-0 left-0 right-0 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-t-2xl shadow-2xl p-4 max-h-[80vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
-                <h3 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100 mb-6">Select a Category</h3>
-                <div className="flex flex-wrap justify-center gap-3 pb-4">
-                  {dynamicFilterCategories.map(cat => (
-                    <button
-                      key={cat.name}
-                      onClick={() => handleFilterClick(cat.name)}
-                      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${selectedCategory === cat.name || (cat.name === 'All' && !selectedCategory) ? `${CATEGORY_COLORS[cat.name]} shadow-lg` : 'bg-white/80 text-gray-700 dark:bg-gray-800/60 dark:text-gray-300'}`}
-                    >
-                      <span>{cat.emoji}</span>
-                      <span>{cat.name} {showToolCounts && <span className="font-normal opacity-75">{cat.count}</span>}</span>
-                    </button>
-                  ))}
+            <>
+              {mobileFilterStyle === 'sheet' ? (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={() => setIsFilterModalOpen(false)}>
+                  <motion.div
+                    initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+                    transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                    className="absolute bottom-0 left-0 right-0 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-t-2xl shadow-2xl p-4 max-h-[80vh] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
+                    <h3 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100 mb-6">Select a Category</h3>
+                    <div className="flex flex-wrap justify-center gap-3 pb-4">
+                      {dynamicFilterCategories.map(cat => (
+                        <button
+                          key={cat.name}
+                          onClick={() => handleFilterClick(cat.name)}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${selectedCategory === cat.name || (cat.name === 'All' && !selectedCategory) ? `${CATEGORY_COLORS[cat.name]} shadow-lg` : 'bg-white/80 text-gray-700 dark:bg-gray-800/60 dark:text-gray-300'}`}
+                        >
+                          <span>{cat.emoji}</span>
+                          <span>{cat.name} {showToolCounts && <span className="font-normal opacity-75">{cat.count}</span>}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              ) : (
+                <div className="fixed inset-0 z-50 flex items-center justify-center" >
+                  <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => { setIsFilterModalOpen(false); triggerHapticFeedback(); }}></div>
+                  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-6 w-11/12 max-w-md border border-gray-200/50 dark:border-gray-700/50">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Select a Category</h3>
+                      <button onClick={() => { setIsFilterModalOpen(false); triggerHapticFeedback(); }} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-3">
+                      {dynamicFilterCategories.map(cat => {
+                        const isSelected = selectedCategory === cat.name || (cat.name === 'All' && !selectedCategory);
+                        const colorClasses = CATEGORY_COLORS[cat.name] || CATEGORY_COLORS['All'];
+                        return (
+                          <button
+                            key={cat.name}
+                            onClick={() => handleFilterClick(cat.name)}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${isSelected ? `${colorClasses} shadow-lg` : 'bg-gray-100/80 text-gray-700 dark:bg-gray-900/60 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-700/80'}`}
+                          >
+                            <span>{cat.emoji}</span>
+                            <span>{cat.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              )}
+            </>
           )}
         </AnimatePresence>
       )}

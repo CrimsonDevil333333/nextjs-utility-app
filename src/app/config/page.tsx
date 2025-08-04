@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX, Trash2, RefreshCw, Clock } from 'lucide-react';
+import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX, Trash2, RefreshCw, Clock, Smartphone, Square } from 'lucide-react';
 import { triggerHapticFeedback } from '@/utils/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type Agent = 'gemini' | 'openai';
+type MobileFilterStyle = 'sheet' | 'modal';
 
 // --- Reusable Components ---
 
@@ -28,6 +29,21 @@ const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: (enab
   );
 };
 
+const PillSelector = ({ options, selectedValue, onSelect }: { options: { value: string; label: string; icon: React.ReactNode }[], selectedValue: string, onSelect: (value: any) => void }) => (
+  <div className="flex w-full rounded-lg bg-gray-200 dark:bg-gray-900 p-1">
+    {options.map(({ value, label, icon }) => (
+      <button
+        key={value}
+        onClick={() => { onSelect(value); triggerHapticFeedback(); }}
+        className={`flex-1 rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2 ${selectedValue === value ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50'}`}
+      >
+        {icon}
+        {label}
+      </button>
+    ))}
+  </div>
+);
+
 
 // --- Main Page Component ---
 
@@ -42,7 +58,8 @@ const ConfigPage = () => {
   // New state for enhanced features
   const [autoClearInput, setAutoClearInput] = useState(true);
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
-  const [showToolCounts, setShowToolCounts] = useState(false); // Default is now false
+  const [showToolCounts, setShowToolCounts] = useState(false);
+  const [mobileFilterStyle, setMobileFilterStyle] = useState<MobileFilterStyle>('sheet');
 
   useEffect(() => {
     // Load settings from localStorage on initial render
@@ -64,6 +81,9 @@ const ConfigPage = () => {
     const savedShowCounts = localStorage.getItem('showToolCounts');
     if (savedShowCounts) setShowToolCounts(JSON.parse(savedShowCounts));
 
+    const savedFilterStyle = localStorage.getItem('mobileFilterStyle') as MobileFilterStyle;
+    if (savedFilterStyle) setMobileFilterStyle(savedFilterStyle);
+
   }, []);
 
   const handleSaveSettings = () => {
@@ -74,6 +94,7 @@ const ConfigPage = () => {
     localStorage.setItem('autoClearInput', JSON.stringify(autoClearInput));
     localStorage.setItem('animationsEnabled', JSON.stringify(animationsEnabled));
     localStorage.setItem('showToolCounts', JSON.stringify(showToolCounts));
+    localStorage.setItem('mobileFilterStyle', mobileFilterStyle);
     setIsKeySaved(true);
     setTimeout(() => setIsKeySaved(false), 2000);
   };
@@ -96,6 +117,11 @@ const ConfigPage = () => {
   const handleApiKeyChange = (agent: Agent, value: string) => {
     setApiKeys(prev => ({ ...prev, [agent]: value }));
   };
+
+  const mobileFilterOptions = [
+    { value: 'sheet', label: 'Bottom Sheet', icon: <Smartphone size={16} /> },
+    { value: 'modal', label: 'Center Modal', icon: <Square size={16} /> },
+  ];
 
   const commonInputClass = "w-full p-3 pl-10 border rounded-lg bg-gray-50 dark:bg-gray-900/50 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors";
   const cardClass = "bg-white/80 dark:bg-gray-800/50 p-6 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/50";
@@ -150,6 +176,10 @@ const ConfigPage = () => {
                 <div className="flex items-center justify-between">
                   <label htmlFor="showCountsToggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show tool counts</label>
                   <ToggleSwitch enabled={showToolCounts} onChange={setShowToolCounts} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mobile Filter Style</label>
+                  <PillSelector options={mobileFilterOptions} selectedValue={mobileFilterStyle} onSelect={setMobileFilterStyle} />
                 </div>
               </div>
             </div>
