@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX, Sun, Moon, Monitor, Trash2, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { KeyRound, Save, Check, Zap, ZapOff, Volume2, VolumeX, Trash2 } from 'lucide-react';
 import { triggerHapticFeedback } from '@/utils/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type Agent = 'gemini' | 'openai';
-type Theme = 'light' | 'dark' | 'system';
 
 // --- Reusable Components ---
 
@@ -29,21 +28,6 @@ const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: (enab
   );
 };
 
-const PillSelector = ({ options, selectedValue, onSelect }: { options: { value: Theme; label: string; icon: React.ReactNode }[], selectedValue: Theme, onSelect: (value: Theme) => void }) => (
-  <div className="flex w-full rounded-lg bg-gray-200 dark:bg-gray-900 p-1">
-    {options.map(({ value, label, icon }) => (
-      <button
-        key={value}
-        onClick={() => { onSelect(value); triggerHapticFeedback(); }}
-        className={`flex-1 rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2 ${selectedValue === value ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50'}`}
-      >
-        {icon}
-        {label}
-      </button>
-    ))}
-  </div>
-);
-
 
 // --- Main Page Component ---
 
@@ -52,21 +36,10 @@ const ConfigPage = () => {
   const [isKeySaved, setIsKeySaved] = useState(false);
   const [hapticEnabled, setHapticEnabled] = useState(false);
   const [hapticIntensity, setHapticIntensity] = useState(0.5);
-  const [theme, setTheme] = useState<Theme>('system');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  // NOTE: This function requires Tailwind's dark mode to be set to 'class'
-  // in your tailwind.config.js file. Example: `darkMode: 'class'`
-  const applyTheme = useCallback((selectedTheme: Theme) => {
-    if (selectedTheme === 'dark' || (selectedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
   useEffect(() => {
-    // Load all settings from localStorage on initial render
+    // Load settings from localStorage on initial render
     const savedApiKeys = localStorage.getItem('userApiKeys');
     if (savedApiKeys) setApiKeys(JSON.parse(savedApiKeys));
 
@@ -75,65 +48,28 @@ const ConfigPage = () => {
 
     const savedIntensity = localStorage.getItem('hapticIntensity');
     if (savedIntensity) setHapticIntensity(parseFloat(savedIntensity));
-
-    // --- Enhanced Theme Handling ---
-    // 1. Get saved theme or default to 'system' and apply it.
-    const savedTheme = (localStorage.getItem('theme') as Theme) || 'system';
-    setTheme(savedTheme);
-    applyTheme(savedTheme);
-
-    // 2. Listen for changes in system preference to make 'system' mode dynamic.
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = () => {
-      // Only update if the current setting in localStorage is 'system'
-      if (localStorage.getItem('theme') === 'system') {
-        applyTheme('system');
-      }
-    };
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-
-    // Cleanup listener on component unmount
-    return () => {
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
-  }, [applyTheme]); // Rerun if applyTheme changes (it won't, but it's good practice)
-
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    applyTheme(newTheme);
-  };
+  }, []);
 
   const handleSaveSettings = () => {
     triggerHapticFeedback();
     localStorage.setItem('userApiKeys', JSON.stringify(apiKeys));
     localStorage.setItem('hapticFeedback', JSON.stringify(hapticEnabled));
     localStorage.setItem('hapticIntensity', hapticIntensity.toString());
-    // Theme is already saved in handleThemeChange
     setIsKeySaved(true);
     setTimeout(() => setIsKeySaved(false), 2000);
   };
 
   const handleResetAll = () => {
     triggerHapticFeedback();
-    localStorage.clear();
-    // After clearing, re-apply the default 'system' theme before reloading
-    document.documentElement.classList.remove('dark');
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-    }
+    localStorage.removeItem('userApiKeys');
+    localStorage.removeItem('hapticFeedback');
+    localStorage.removeItem('hapticIntensity');
     window.location.reload();
   };
 
   const handleApiKeyChange = (agent: Agent, value: string) => {
     setApiKeys(prev => ({ ...prev, [agent]: value }));
   };
-
-  const themeOptions = [
-    { value: 'light' as Theme, label: 'Light', icon: <Sun size={16} /> },
-    { value: 'dark' as Theme, label: 'Dark', icon: <Moon size={16} /> },
-    { value: 'system' as Theme, label: 'System', icon: <Monitor size={16} /> },
-  ];
 
   const commonInputClass = "w-full p-3 pl-10 border rounded-lg bg-gray-50 dark:bg-gray-900/50 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors";
   const cardClass = "bg-white/80 dark:bg-gray-800/50 p-6 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/50";
@@ -175,10 +111,6 @@ const ConfigPage = () => {
                     <div className="flex items-center gap-4 mt-2"><VolumeX size={20} className="text-gray-400" /><input id="hapticIntensity" type="range" min="0.1" max="1" step="0.1" value={hapticIntensity} onChange={(e) => setHapticIntensity(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:bg-blue-600 [&::-moz-range-thumb]:bg-blue-600" /><Volume2 size={20} className="text-gray-400" /></div>
                   </div>
                 )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Appearance</label>
-                  <PillSelector options={themeOptions} selectedValue={theme} onSelect={handleThemeChange} />
-                </div>
               </div>
             </div>
 
@@ -195,13 +127,12 @@ const ConfigPage = () => {
         </div>
       </div>
 
-      {/* Reset Confirmation Modal */}
       <AnimatePresence>
         {showResetConfirm && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Reset All Settings?</h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure? This will clear all your saved API keys and preferences. This action cannot be undone.</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure? This will clear your saved API keys and preferences. This action cannot be undone.</p>
               <div className="flex justify-end items-center gap-3">
                 <button onClick={() => setShowResetConfirm(false)} className="px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 bg-gray-200/80 dark:bg-gray-700/80 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Cancel</button>
                 <button onClick={handleResetAll} className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-md">Yes, Reset</button>
