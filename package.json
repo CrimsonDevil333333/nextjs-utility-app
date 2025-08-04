@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"browser-image-compression": "^2.0.2",
+		"cron": "^4.3.3",
 		"cron-parser": "^5.3.0",
 		"d3-shape": "^3.2.0",
 		"date-fns": "^4.1.0",

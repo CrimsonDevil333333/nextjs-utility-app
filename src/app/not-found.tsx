@@ -10,7 +10,7 @@ export default function NotFoundPage() {
   return (
     <>
       <title>404: This page could not be found.</title>
-      <main className="min-h-[calc(100vh-100px)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 text-center">
+      <main className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 text-center">
         <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
           <h1 className="text-8xl font-extrabold text-blue-600 dark:text-blue-400">404</h1>
           <h2 className="mt-4 text-2xl font-bold text-gray-800 dark:text-white">Page Not Found</h2>
