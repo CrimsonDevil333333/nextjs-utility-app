@@ -8,6 +8,7 @@ export type Utility = {
 
 export const utilities: Utility[] = [
   { name: '2048', href: '/2048', description: 'A classic sliding puzzle game to reach the 2048 tile.', emoji: '🧮', category: 'Games' },
+  { name: '3D Obstacle Course', href: '/3d-obstacle-course', description: 'Dodge obstacles in this fast-paced 3D side-scroller.', emoji: '🏃‍♂️', category: 'Games' },
   { name: 'Base64 Converter', href: '/base64-converter', description: 'Encode and decode Base64 text.', emoji: '🧾', category: 'Converters' },
   { name: 'BMI Calculator', href: '/bmi-calculator', description: 'Calculate your Body Mass Index.', emoji: '⚖️', category: 'Health' },
   { name: 'Box Shadow Generator', href: '/box-shadow-generator', description: 'Visually create and customize CSS box shadows.', emoji: '🌫️', category: 'Design' },
@@ -62,6 +63,7 @@ export const utilities: Utility[] = [
   { name: 'Regex Tester', href: '/regex-tester', description: 'An interactive tool to write and test regular expressions.', emoji: '🔍🧪', category: 'Developers' },
   { name: 'SQL Query Generator', href: '/sql-query-generator', description: 'Generate SQL queries from a text description using AI.', emoji: '📂🤖', category: 'AI Tools' },
   { name: 'Scientific Calculator', href: '/scientific-calculator', description: 'An advanced calculator with scientific functions.', emoji: '🧪', category: 'Math' },
+  { name: 'Sliding Puzzle', href: '/sliding-puzzle', description: 'A classic tile-sliding game to test your logic and problem-solving skills.', emoji: '🧩', category: 'Games' },
   { name: 'Slug Generator', href: '/slug-generator', description: 'Convert any string into a URL-friendly slug.', emoji: '📛', category: 'Text' },
   { name: 'Snake Game', href: '/snake-game', description: 'Play the classic, retro Snake game.', emoji: '🐍', category: 'Games' },
   { name: 'Solitaire', href: '/solitaire', description: 'The classic Klondike Solitaire card game.', emoji: '🃏', category: 'Games' },
