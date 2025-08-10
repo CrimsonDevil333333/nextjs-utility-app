@@ -117,7 +117,7 @@ const GemMatchGame = () => {
     };
 
     const handleMatches = (currentBoard: Gem[][], matches: { r: number, c: number }[]) => {
-        let newBoard = currentBoard.map(row => [...row]);
+        const newBoard = currentBoard.map(row => [...row]);
         setScore(s => s + matches.length * 10);
 
         matches.forEach(({ r, c }) => {
