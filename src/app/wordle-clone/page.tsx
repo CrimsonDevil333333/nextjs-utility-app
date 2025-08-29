@@ -199,7 +199,7 @@ export default function WordleClonePage() {
   };
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4">
+    <main className="min-h-[calc(100dvh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4">
       <div className="w-full max-w-lg mx-auto">
         <header className="relative w-full text-center border-b border-gray-300 dark:border-gray-600 pb-2 mb-4">
           <h1 className="text-4xl font-bold">Wordle Clone</h1>

@@ -55,7 +55,7 @@ const MarkdownPreviewerPage = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="min-h-[calc(100dvh-4rem)] w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
             <div className="w-full max-w-7xl mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">Markdown Previewer</h1>
@@ -63,7 +63,7 @@ const MarkdownPreviewerPage = () => {
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-                    <div className="grid md:grid-cols-2 gap-4 h-[60vh] min-h-[500px]">
+                    <div className="grid md:grid-cols-2 gap-4 h-[60dvh] min-h-[500px]">
                         <div className="relative">
                             <textarea
                                 value={markdown}

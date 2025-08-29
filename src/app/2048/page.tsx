@@ -197,7 +197,7 @@ const Game2048Page = () => {
   };
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none">
+    <main className="min-h-[calc(100dvh-4rem)] bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none">
       <div className="flex flex-col items-center w-full max-w-md mx-auto">
         <div className="flex justify-between items-center w-full mb-4">
           <h1 className="text-4xl sm:text-6xl font-bold text-gray-700 dark:text-gray-200">2048</h1>

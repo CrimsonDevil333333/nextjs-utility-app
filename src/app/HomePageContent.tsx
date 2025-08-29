@@ -387,7 +387,7 @@ export default function HomePageContent() {
                   <motion.div
                     initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
                     transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                    className="absolute bottom-0 left-0 right-0 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-t-2xl shadow-2xl p-4 max-h-[80vh] overflow-y-auto"
+                    className="absolute bottom-0 left-0 right-0 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-t-2xl shadow-2xl p-4 max-h-[80dvh] overflow-y-auto"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>

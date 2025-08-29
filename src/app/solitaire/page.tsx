@@ -201,7 +201,7 @@ const SolitairePage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-2 sm:p-4 bg-green-800 dark:bg-green-900 min-h-[calc(100vh-4rem)] font-sans">
+    <div className="flex flex-col items-center p-2 sm:p-4 bg-green-800 dark:bg-green-900 min-h-[calc(100dvh-4rem)] font-sans">
       <div className="w-full flex justify-between items-center mb-2 sm:mb-4 max-w-7xl">
         <h1 className="text-xl sm:text-3xl font-bold text-white">Solitaire 🃏</h1>
         <div className="flex items-center gap-4">
@@ -232,7 +232,7 @@ const SolitairePage = () => {
 
         <div className="grid grid-cols-7 gap-1 sm:gap-4">
           {tableau.map((pile, i) => (
-            <div key={i} className="relative w-full min-h-[40vh] sm:min-h-[60vh]" onClick={() => pile.length === 0 && handleCardClick('tableau', i)}>
+            <div key={i} className="relative w-full min-h-[40dvh] sm:min-h-[60dvh]" onClick={() => pile.length === 0 && handleCardClick('tableau', i)}>
               {pile.map((card, j) => (
                 <div
                   key={j}
