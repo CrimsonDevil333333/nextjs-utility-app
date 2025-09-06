@@ -1,5 +1,3 @@
-'use client';
-
 import { ReactNode } from 'react';
 import { Metadata } from 'next';
 
@@ -21,5 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function SwaggerEditorLayout({ children }: { children: ReactNode }) {
-  return <div className="h-screen w-screen bg-gray-100 dark:bg-gray-900">{children}</div>;
+  return <>{children}</>;
 }
