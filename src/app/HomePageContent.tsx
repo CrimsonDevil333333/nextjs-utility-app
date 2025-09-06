@@ -280,10 +280,18 @@ export default function HomePageContent() {
               ref={searchInputRef}
               type="text"
               placeholder="Search for any tool..."
-              className="w-full p-4 pl-14 text-lg border-2 border-transparent rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-lg"
+              className="w-full p-4 pl-14 pr-12 text-lg border-2 border-transparent rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-lg"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+            )}
           </div>
           <div className="flex justify-center items-center gap-2">
             <LayoutSwitcher currentLayout={layoutStyle} onLayoutChange={handleLayoutChange} />
@@ -385,9 +393,20 @@ export default function HomePageContent() {
               {mobileFilterStyle === 'sheet' ? (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={() => setIsFilterModalOpen(false)}>
                   <motion.div
-                    initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                    transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                    className="absolute bottom-0 left-0 right-0 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-t-2xl shadow-2xl p-4 max-h-[80dvh] overflow-y-auto"
+                    drag="y"
+                    dragConstraints={{ top: 0, bottom: 300 }}
+                    dragElastic={{ top: 0, bottom: 0.5 }}
+                    onDragEnd={(event, info) => {
+                      if (info.offset.y > 150) {
+                        setIsFilterModalOpen(false);
+                        triggerHapticFeedback();
+                      }
+                    }}
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
+                    transition={{ type: 'spring', damping: 50, stiffness: 500 }}
+                    className="absolute bottom-0 left-0 right-0 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-t-2xl shadow-2xl p-4 max-h-[80dvh] overflow-y-auto cursor-grab active:cursor-grabbing"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
