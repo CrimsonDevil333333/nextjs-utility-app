@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import Header from './_components/Header';
 import HapticFeedbackModal from '@/components/utility/HapticFeedbackModal'; 
+import { ThemeProvider } from 'next-themes'
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       </head>
       {/* Use flexbox on the body and set it to min-h-screen */}
       <body className={`flex flex-col min-h-screen ${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <Header />
         <HapticFeedbackModal />
         {/* Use flex-grow to make the main content take up the remaining space */}
@@ -33,6 +35,7 @@ export default function RootLayout({
             {children}
         </main>
         <footer></footer>
+        </ThemeProvider>
       </body>
     </html>
   );

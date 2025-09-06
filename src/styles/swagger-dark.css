@@ -1,0 +1,165 @@
+/* styles/swagger-dark.css */
+
+/* This is the main container class from the React component */
+.swagger-container-dark .swagger-ui {
+  background-color: #24292e;
+}
+
+/* --- Force a light base text color on almost everything --- */
+.swagger-container-dark .swagger-ui,
+.swagger-container-dark .swagger-ui .opblock-description-wrapper p,
+.swagger-container-dark .swagger-ui .response-col_description,
+.swagger-container-dark .swagger-ui .opblock-title_normal,
+.swagger-container-dark .swagger-ui .tab li {
+  color: #d1d5db !important;
+}
+
+/* --- Typography & General Elements --- */
+.swagger-container-dark .swagger-ui .info .title,
+.swagger-container-dark .swagger-ui .info .description,
+.swagger-container-dark .swagger-ui h1,
+.swagger-container-dark .swagger-ui h2,
+.swagger-container-dark .swagger-ui h3,
+.swagger-container-dark .swagger-ui h4,
+.swagger-container-dark .swagger-ui h5,
+.swagger-container-dark .swagger-ui .opblock-tag {
+  color: #ffffff !important;
+}
+
+.swagger-container-dark .swagger-ui .info a,
+.swagger-container-dark .swagger-ui .link {
+  color: #58a6ff !important;
+}
+
+/* --- FIX: Servers and Authorize sections --- */
+.swagger-container-dark .swagger-ui .scheme-container,
+.swagger-container-dark .swagger-ui .servers {
+  background: #2d333b;
+  border: 1px solid #444c56;
+  box-shadow: none;
+}
+.swagger-container-dark .swagger-ui .servers > label {
+  color: #ffffff;
+}
+.swagger-container-dark .swagger-ui .auth-wrapper .authorize {
+  background: #2d333b;
+  border: 1px solid #58a6ff;
+  box-shadow: none;
+}
+.swagger-container-dark .swagger-ui .auth-wrapper .authorize svg {
+  fill: #58a6ff;
+}
+
+/* --- Operation Blocks (Endpoints) --- */
+.swagger-container-dark .swagger-ui .opblock,
+.swagger-container-dark .swagger-ui .opblock .opblock-section-header,
+.swagger-container-dark .swagger-ui .opblock-tag {
+  background: #2d333b;
+  border-color: #444c56;
+}
+.swagger-container-dark .swagger-ui .opblock .opblock-body {
+  background-color: #24292e;
+}
+
+/* --- Tables, Parameters & Responses --- */
+.swagger-container-dark .swagger-ui .opblock-section-header {
+  background-color: #24292e;
+}
+.swagger-container-dark .swagger-ui table thead th {
+  background: #24292e;
+  color: #ffffff;
+  border-bottom: 1px solid #444c56;
+}
+.swagger-container-dark .swagger-ui .responses-table tr td {
+  border-color: #444c56;
+}
+.swagger-container-dark .swagger-ui .model-example {
+  background-color: #24292e;
+}
+
+/* --- FIX: Improved Text Contrast for Parameters & Schemas --- */
+.swagger-container-dark .swagger-ui .parameter__name,
+.swagger-container-dark .swagger-ui .parameter__type,
+.swagger-container-dark .swagger-ui .parameter__in {
+  color: #c9d1d9;
+}
+.swagger-container-dark .swagger-ui .parameter__name.required:after {
+  color: #f85149; /* Bright red for the 'required' asterisk */
+}
+
+/* --- Inputs, Buttons & Modals --- */
+.swagger-container-dark .swagger-ui input,
+.swagger-container-dark .swagger-ui select,
+.swagger-container-dark .swagger-ui textarea {
+  background-color: #24292e;
+  color: #ffffff;
+  border: 1px solid #444c56;
+}
+
+/* --- FIX: Modal Header Background --- */
+.swagger-container-dark .swagger-ui .dialog-ux .modal-ux-header {
+  background: #2d333b;
+  border-bottom: 1px solid #444c56;
+}
+.swagger-container-dark .swagger-ui .dialog-ux .modal-ux-header h3 {
+  color: #ffffff;
+}
+.swagger-container-dark .swagger-ui .dialog-ux .modal-ux-content {
+  background: #2d333b;
+}
+
+/* --- FIX: Enhanced Button Styles --- */
+/* General button style */
+.swagger-container-dark .swagger-ui .btn {
+  background-color: transparent;
+  border: 1px solid #444c56;
+  color: #c9d1d9;
+}
+.swagger-container-dark .swagger-ui .btn:hover {
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+/* Primary action buttons (Authorize, Execute, Try it out) */
+.swagger-container-dark .swagger-ui .btn.authorize,
+.swagger-container-dark .swagger-ui .btn.execute,
+.swagger-container-dark .swagger-ui .try-out .btn {
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+.swagger-container-dark .swagger-ui .btn.authorize:hover,
+.swagger-container-dark .swagger-ui .btn.execute:hover,
+.swagger-container-dark .swagger-ui .try-out .btn:hover {
+  background-color: #58a6ff;
+  color: #ffffff;
+}
+
+.swagger-ui .topbar {
+  display: none !important;
+}
+
+.swagger-container-dark .swagger-ui .opblock .opblock-summary-path,
+.swagger-container-dark .swagger-ui .opblock .opblock-summary-description {
+  color: #c9d1d9 !important; 
+}
+
+/* --- FIX: Dim text in "Available authorizations" modal --- */
+.swagger-container-dark .swagger-ui .auth-container .auth-dl dt {
+  color: #c9d1d9 !important;
+}
+
+/* --- FIX: Dim text in Schemas section (titles and properties) --- */
+.swagger-container-dark .swagger-ui .model-container,
+.swagger-container-dark .swagger-ui .model-title,
+.swagger-container-dark .swagger-ui .model .property {
+  color: #c9d1d9 !important;
+}
+
+/* --- FIX: Dim text in the Responses table body --- */
+.swagger-container-dark .swagger-ui .responses-table td {
+  color: #c9d1d9 !important;
+}
+
+.swagger-container-dark .swagger-ui .auth-container .auth-dl dt,
+.swagger-container-dark .swagger-ui .auth-container .auth-dl dd {
+  color: #c9d1d9 !important;
+}

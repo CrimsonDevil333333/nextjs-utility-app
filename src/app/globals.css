@@ -28,3 +28,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+.swagger-ui .topbar {
+  display: none !important;
+}

@@ -71,6 +71,7 @@ export const utilities: Utility[] = [
   { name: 'Stopwatch', href: '/stopwatch', description: 'A simple and precise stopwatch with lap functionality.', emoji: '⏱️', category: 'Tools' },
   { name: 'Story Generator', href: '/story-generator', description: 'Generate a short story from a prompt using AI.', emoji: '📘', category: 'AI Tools' },
   { name: 'Sudoku', href: '/sudoku', description: 'A classic number puzzle game.', emoji: '🔢', category: 'Games' },
+  { name: 'Swagger Editor', href: '/swagger-editor', description: 'Create, edit, and test your OpenAPI specs.', emoji: '📝', category: 'Developers' },
   { name: 'Tetris', href: '/tetris', description: 'The classic block-stacking puzzle game.', emoji: '🧱', category: 'Games' },
   { name: 'Text Case Converter', href: '/text-case-converter', description: 'Convert text between various casing conventions.', emoji: '🔤', category: 'Text' },
   { name: 'Text Diff Checker', href: '/text-diff', description: 'Compare two texts and highlight differences.', emoji: '🆚', category: 'Text' },
