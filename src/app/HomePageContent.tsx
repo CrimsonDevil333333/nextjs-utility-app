@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Info, ChevronDown, ChevronUp, ArrowUp, Settings, X, Search, LayoutGrid, List, Shuffle, Clock } from 'lucide-react';
+import { Info, ChevronDown, ChevronUp, ArrowUp, Settings, X, Search, LayoutGrid, List, Shuffle, Clock, Rows, Columns } from 'lucide-react';
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { utilities, Utility } from '@/app/data/utilities';
@@ -55,13 +55,71 @@ const UtilityCard = ({ util }: { util: Utility }) => {
   );
 };
 
-const LayoutSwitcher = ({ currentLayout, onLayoutChange }: { currentLayout: 'minimal' | 'classic', onLayoutChange: (layout: 'minimal' | 'classic') => void }) => (
+const UtilityCardCompact = ({ util }: { util: Utility }) => {
+  const handleCardClick = useCallback(() => {
+    triggerHapticFeedback();
+    try {
+      const stored = localStorage.getItem('recentlyUsedTools');
+      let recent: Utility[] = stored ? JSON.parse(stored) : [];
+      recent = recent.filter(u => u.href !== util.href);
+      recent.unshift(util);
+      localStorage.setItem('recentlyUsedTools', JSON.stringify(recent.slice(0, 4)));
+    } catch (e) {
+      console.error("Failed to update recently used tools:", e);
+    }
+  }, [util]);
+
+  return (
+    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in" onClick={handleCardClick}>
+      <div className="p-4 bg-white/80 dark:bg-gray-800/50 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-in-out border border-gray-200/80 dark:border-gray-700/50 h-full flex items-center">
+        <span className="text-3xl mr-4 transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{util.name}</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-xs">{util.description}</p>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+const UtilityCardGrid = ({ util }: { util: Utility }) => {
+  const handleCardClick = useCallback(() => {
+    triggerHapticFeedback();
+    try {
+      const stored = localStorage.getItem('recentlyUsedTools');
+      let recent: Utility[] = stored ? JSON.parse(stored) : [];
+      recent = recent.filter(u => u.href !== util.href);
+      recent.unshift(util);
+      localStorage.setItem('recentlyUsedTools', JSON.stringify(recent.slice(0, 4)));
+    } catch (e) {
+      console.error("Failed to update recently used tools:", e);
+    }
+  }, [util]);
+
+  return (
+    <Link href={util.href} key={util.name} className="group block h-full animate-card-fade-in" onClick={handleCardClick}>
+      <div className="p-4 bg-white/80 dark:bg-gray-800/50 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 ease-in-out border border-gray-200/80 dark:border-gray-700/50 h-full flex flex-col items-center justify-center text-center">
+        <span className="text-4xl mb-2 transform group-hover:scale-110 transition-transform duration-300 ease-in-out">{util.emoji}</span>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{util.name}</h2>
+      </div>
+    </Link>
+  );
+};
+
+const LayoutSwitcher = ({ currentLayout, onLayoutChange }: { currentLayout: 'minimal' | 'classic' | 'compact' | 'grid', onLayoutChange: (layout: 'minimal' | 'classic' | 'compact' | 'grid') => void }) => (
   <div className="flex items-center gap-1 p-1 rounded-full bg-gray-200 dark:bg-gray-900">
     <button onClick={() => onLayoutChange('minimal')} className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full transition-all ${currentLayout === 'minimal' ? 'bg-white dark:bg-gray-700 shadow' : 'text-gray-600 dark:text-gray-400'}`}>
       <LayoutGrid size={16} /> Minimal
     </button>
     <button onClick={() => onLayoutChange('classic')} className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full transition-all ${currentLayout === 'classic' ? 'bg-white dark:bg-gray-700 shadow' : 'text-gray-600 dark:text-gray-400'}`}>
       <List size={16} /> Classic
+    </button>
+    {/* Uncomment it to enable compact view mode */}
+    {/* <button onClick={() => onLayoutChange('compact')} className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full transition-all ${currentLayout === 'compact' ? 'bg-white dark:bg-gray-700 shadow' : 'text-gray-600 dark:text-gray-400'}`}>
+      <Rows size={16} /> Compact
+    </button> */}
+    <button onClick={() => onLayoutChange('grid')} className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full transition-all ${currentLayout === 'grid' ? 'bg-white dark:bg-gray-700 shadow' : 'text-gray-600 dark:text-gray-400'}`}>
+      <Columns size={16} /> Grid
     </button>
   </div>
 );
@@ -118,13 +176,14 @@ export default function HomePageContent() {
 
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get('category'));
-  const [layoutStyle, setLayoutStyle] = useState<'minimal' | 'classic'>('minimal');
+  const [layoutStyle, setLayoutStyle] = useState<'minimal' | 'classic' | 'compact' | 'grid'>('minimal');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [showToolCounts, setShowToolCounts] = useState(false);
+  const [showRecentlyUsed, setShowRecentlyUsed] = useState(true);
   const [recentlyUsed, setRecentlyUsed] = useState<Utility[]>([]);
   const [showWelcome, setShowWelcome] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -169,11 +228,14 @@ export default function HomePageContent() {
     const savedExpansionState = localStorage.getItem('expandedCategories');
     setExpandedCategories(savedExpansionState ? JSON.parse(savedExpansionState) : sortedCategories.reduce((acc, category) => ({ ...acc, [category]: true }), {}));
 
-    const savedLayout = localStorage.getItem('homePageLayout') as 'minimal' | 'classic';
+    const savedLayout = localStorage.getItem('homePageLayout') as 'minimal' | 'classic' | 'compact' | 'grid';
     if (savedLayout) setLayoutStyle(savedLayout);
 
     const savedShowCounts = localStorage.getItem('showToolCounts');
     if (savedShowCounts) setShowToolCounts(JSON.parse(savedShowCounts));
+
+    const savedShowRecentlyUsed = localStorage.getItem('showRecentlyUsed');
+    if (savedShowRecentlyUsed) setShowRecentlyUsed(JSON.parse(savedShowRecentlyUsed));
 
     const storedRecent = localStorage.getItem('recentlyUsedTools');
     if (storedRecent) setRecentlyUsed(JSON.parse(storedRecent));
@@ -216,7 +278,7 @@ export default function HomePageContent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const handleLayoutChange = (style: 'minimal' | 'classic') => {
+  const handleLayoutChange = (style: 'minimal' | 'classic' | 'compact' | 'grid') => {
     setLayoutStyle(style);
     localStorage.setItem('homePageLayout', style);
     triggerHapticFeedback();
@@ -248,6 +310,62 @@ export default function HomePageContent() {
   const handleOpenFilterModal = () => {
     setIsFilterModalOpen(true);
     triggerHapticFeedback();
+  };
+
+  const renderUtilities = () => {
+    if (filteredUtilities.length === 0) {
+      return <div className="text-center py-10"><p className="text-gray-600 dark:text-gray-400 text-lg">No utilities found.</p></div>;
+    }
+
+    if (layoutStyle === 'classic') {
+      return (
+        <div className="space-y-12">
+          <div className="flex justify-end gap-2">
+            <button onClick={() => setAllCategoriesExpanded(true)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Expand All</button>
+            <button onClick={() => setAllCategoriesExpanded(false)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Collapse All</button>
+          </div>
+          {sortedCategories.map((category) => {
+            const utilsInCategory = groupedUtilities[category];
+            return (
+              <section key={category}>
+                <button onClick={() => toggleCategory(category)} className="w-full flex justify-between items-center text-left text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b-2 border-gray-300 dark:border-gray-700">
+                  <span>{category} {showToolCounts && <span className="text-lg font-normal text-gray-500 dark:text-gray-400">({utilsInCategory.length})</span>}</span>
+                  <ChevronDown className={`w-6 h-6 transition-transform duration-300 ${expandedCategories[category] ? 'rotate-180' : ''}`} />
+                </button>
+                <div className={`grid overflow-hidden transition-all duration-500 ease-in-out ${expandedCategories[category] ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                  <div className="min-h-0 col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {utilsInCategory.map(util => (<UtilityCard key={util.name} util={util} />))}
+                  </div>
+                </div>
+              </section>
+            )
+          })}
+        </div>
+      );
+    }
+
+    if (layoutStyle === 'compact') {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredUtilities.map(util => (<UtilityCardCompact key={util.name} util={util} />))}
+        </div>
+      );
+    }
+
+    if (layoutStyle === 'grid') {
+      return (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {filteredUtilities.map(util => (<UtilityCardGrid key={util.name} util={util} />))}
+        </div>
+      );
+    }
+
+    // Minimal layout is the default
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredUtilities.map(util => (<UtilityCard key={util.name} util={util} />))}
+      </div>
+    );
   };
 
   return (
@@ -327,7 +445,7 @@ export default function HomePageContent() {
           </section>
         )}
 
-        {!isFiltered && (
+        {!isFiltered && showRecentlyUsed && (
           <section className="mb-12 space-y-8">
             {featuredTools.length > 0 && (
               <div>
@@ -338,7 +456,7 @@ export default function HomePageContent() {
               </div>
             )}
             {recentlyUsed.length > 0 && (
-              <div>
+              <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"><Clock size={22} /> Recently Used</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {recentlyUsed.map(util => <UtilityCard key={util.name} util={util} />)}
@@ -349,40 +467,7 @@ export default function HomePageContent() {
         )}
 
         <div>
-          {layoutStyle === 'classic' && !isFiltered ? (
-            <div className="space-y-12">
-              <div className="flex justify-end gap-2">
-                <button onClick={() => setAllCategoriesExpanded(true)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Expand All</button>
-                <button onClick={() => setAllCategoriesExpanded(false)} className="px-3 py-1 text-xs font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition">Collapse All</button>
-              </div>
-              {sortedCategories.map((category) => {
-                const utilsInCategory = groupedUtilities[category];
-                return (
-                  <section key={category}>
-                    <button onClick={() => toggleCategory(category)} className="w-full flex justify-between items-center text-left text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b-2 border-gray-300 dark:border-gray-700">
-                      <span>{category} {showToolCounts && <span className="text-lg font-normal text-gray-500 dark:text-gray-400">({utilsInCategory.length})</span>}</span>
-                      <ChevronDown className={`w-6 h-6 transition-transform duration-300 ${expandedCategories[category] ? 'rotate-180' : ''}`} />
-                    </button>
-                    <div className={`grid overflow-hidden transition-all duration-500 ease-in-out ${expandedCategories[category] ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-                      <div className="min-h-0 col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {utilsInCategory.map(util => (<UtilityCard key={util.name} util={util} />))}
-                      </div>
-                    </div>
-                  </section>
-                )
-              })}
-            </div>
-          ) : (
-            <>
-              {filteredUtilities.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredUtilities.map(util => (<UtilityCard key={util.name} util={util} />))}
-                </div>
-              ) : (
-                <div className="text-center py-10"><p className="text-gray-600 dark:text-gray-400 text-lg">No utilities found.</p></div>
-              )}
-            </>
-          )}
+          {renderUtilities()}
         </div>
       </div>
 

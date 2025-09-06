@@ -59,6 +59,7 @@ const ConfigPage = () => {
   const [autoClearInput, setAutoClearInput] = useState(true);
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
   const [showToolCounts, setShowToolCounts] = useState(false);
+  const [showRecentlyUsed, setShowRecentlyUsed] = useState(true);
   const [mobileFilterStyle, setMobileFilterStyle] = useState<MobileFilterStyle>('sheet');
 
   useEffect(() => {
@@ -81,6 +82,9 @@ const ConfigPage = () => {
     const savedShowCounts = localStorage.getItem('showToolCounts');
     if (savedShowCounts) setShowToolCounts(JSON.parse(savedShowCounts));
 
+    const savedShowRecentlyUsed = localStorage.getItem('showRecentlyUsed');
+    if (savedShowRecentlyUsed) setShowRecentlyUsed(JSON.parse(savedShowRecentlyUsed));
+
     const savedFilterStyle = localStorage.getItem('mobileFilterStyle') as MobileFilterStyle;
     if (savedFilterStyle) setMobileFilterStyle(savedFilterStyle);
 
@@ -94,6 +98,7 @@ const ConfigPage = () => {
     localStorage.setItem('autoClearInput', JSON.stringify(autoClearInput));
     localStorage.setItem('animationsEnabled', JSON.stringify(animationsEnabled));
     localStorage.setItem('showToolCounts', JSON.stringify(showToolCounts));
+    localStorage.setItem('showRecentlyUsed', JSON.stringify(showRecentlyUsed));
     localStorage.setItem('mobileFilterStyle', mobileFilterStyle);
     setIsKeySaved(true);
     setTimeout(() => setIsKeySaved(false), 2000);
@@ -176,6 +181,10 @@ const ConfigPage = () => {
                 <div className="flex items-center justify-between">
                   <label htmlFor="showCountsToggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show tool counts</label>
                   <ToggleSwitch enabled={showToolCounts} onChange={setShowToolCounts} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="showRecentlyUsedToggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show recently used</label>
+                  <ToggleSwitch enabled={showRecentlyUsed} onChange={setShowRecentlyUsed} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mobile Filter Style</label>
